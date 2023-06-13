@@ -4,7 +4,8 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/esm/Button';
 import ListGroup from 'react-bootstrap/ListGroup';
 import { useEffect, useState } from 'react';
-import { GoogleLogin, GoogleLogout } from 'react-google-login';
+// import { GoogleLogin, GoogleLogout } from 'react-google-login';
+import { GoogleLogin, googleLogout } from '@react-oauth/google';
 import { gapi } from 'gapi-script';
 import axiosInstance from '../../axios';
 import Loading from '../Loading';
@@ -352,16 +353,17 @@ return (<Row>
 <Col sm={2} className="vh-100 overflow-auto d-flex align-items-center justify-content-center" style={{borderRight: '5px solid gray'}}>
 {googleLoggedIn ? 
     <div className="vh-100 d-flex flex-column">
-    <div id="signOutButton" className='m-3'>
-        <GoogleLogout
+    <Button onClick={() => googleLogout()} id="signOutButton" className='m-3'>
+        {/* <googleLogout
             clientId={CLIENT_ID}
             buttonText="Logout"
             onLogoutSuccess={() => onSuccess(false)}
             onFailure={onFailure}
             cookiePolicy={'single_host_origin'}
             isSignedIn={true}
-        />
-    </div>
+        /> */}
+        Sign Out
+    </Button>
     
     {documentId.length === 0 ? 
     <Button className='customBtn' onClick={() => createFile()}>Create Doc</Button>
@@ -405,13 +407,23 @@ return (<Row>
     : 
 
     <div id='signInButton'>
-        <GoogleLogin
+        {/* <GoogleLogin
             clientId={CLIENT_ID}
             buttonText="Login"
             onSuccess={() => onSuccess(true)}
             onFailure={onFailure}
             cookiePolicy={'single_host_origin'}
             isSignedIn={true}
+        /> */}
+        <GoogleLogin
+            onSuccess={credentialResponse => {
+                onSuccess(true);
+                console.log(credentialResponse);
+            }}
+            onError={() => {
+                onFailure()
+                console.log('Login Failed');
+            }}
         />
     </div>
     }

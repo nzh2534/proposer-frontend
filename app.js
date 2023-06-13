@@ -9,7 +9,7 @@ app.use(express.static(path.join(__dirname, 'build')));
 app.listen(port, () => console.log(`App is live on port ＄{port}!`))
 
 app.get('/*', function(req, res) {
-    res.sendFile(path.join(__dirname, 'deploy/build/index.html'), function(err) {
+    res.sendFile(path.join(__dirname, 'build/index.html'), function(err) {
       if (err) {
         res.status(500).send(err)
       }
