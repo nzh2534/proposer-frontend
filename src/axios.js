@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const apiUrl = 'https://radiant-inlet-42144.herokuapp.com/api/';
+const apiUrl = process.env.REACT_APP_VAR_URL;
 
 const axiosInstance = axios.create({
 	baseURL: apiUrl,

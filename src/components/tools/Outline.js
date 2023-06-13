@@ -4,20 +4,17 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/esm/Button';
 import ListGroup from 'react-bootstrap/ListGroup';
 import { useEffect, useState } from 'react';
-// import { GoogleLogin, GoogleLogout } from 'react-google-login';
-import { GoogleLogin, googleLogout } from '@react-oauth/google';
+import { GoogleLogin} from '@react-oauth/google';
 import { gapi } from 'gapi-script';
 import axiosInstance from '../../axios';
-import Loading from '../Loading';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
-const CLIENT_ID = "258828271857-6nal3qlhvv62967m73bs702sackecvcg.apps.googleusercontent.com"
-const API_KEY = "AIzaSyC_MtDLf1Xundo10nc9GWWYhc5Yi4Ru6UI"
-const SCOPES = "https://www.googleapis.com/auth/drive";
+const API_KEY = process.env.REACT_APP_API_GOOGLE_KEY
 
 function Outline({textArray, proposalData}) {
     var testHeader = "\nCOVER PAGE"
     var instructionText = "\n\nINSTRUCTIONS FOR THIS DOCUMENT:\n(1) All highlighted text should eventually be deleted\n"
-    const [googleLoggedIn, updateGoogleLoggedIn] = useState(true);  
+    const [googleLoggedIn, updateGoogleLoggedIn] = useState(false);  
     const [sectionCountArr, updateSectionCountArr] = useState([]);
     const [outlineContent, updateOutlineContent] = useState(false);
     const [documentId, updateDocumentId] = useState(proposalData.proposal_id);
@@ -58,21 +55,24 @@ function Outline({textArray, proposalData}) {
     const onSuccess = (res) => {
         console.log("Login Success!")
         updateGoogleLoggedIn(res);
+        gapi.load('client:auth2', start);
     }
 
     const onFailure = (res) => {
         console.log("Login Failed!")
     }
 
-    useEffect(() => {
-        function start(){
-            gapi.client.init({
-                apiKey: API_KEY,
-                clientId: CLIENT_ID,
-                scope: SCOPES
-            })
-        };
+    function start(){
+        console.log(gapi)
+        gapi.client.init({
+            apiKey: process.env.REACT_APP_API_GOOGLE_KEY,
+            clientId: process.env.REACT_APP_CLIENT_ID,
+            scope: process.env.REACT_APP_SCOPES_GOOGLE
+        })
+        console.log(gapi)
+    };
 
+    useEffect(() => {
         gapi.load('client:auth2', start);
     })
 
@@ -80,7 +80,7 @@ function Outline({textArray, proposalData}) {
         var accessToken = gapi.auth.getToken().access_token;
         var body = {title: "GAPI COPY"};
         var request = gapi.client.request({
-            'path': '/drive/v3/files/1UWQDbPhfwIsUUnVA-yiiuL7cbulEGAEdElMcqea2FSU/copy',
+            'path': process.env.REACT_APP_TEMPLATE_PATH,
             'method': 'POST'
             });
 
@@ -353,25 +353,25 @@ return (<Row>
 <Col sm={2} className="vh-100 overflow-auto d-flex align-items-center justify-content-center" style={{borderRight: '5px solid gray'}}>
 {googleLoggedIn ? 
     <div className="vh-100 d-flex flex-column">
-    <Button onClick={() => googleLogout()} id="signOutButton" className='m-3'>
-        {/* <googleLogout
-            clientId={CLIENT_ID}
-            buttonText="Logout"
-            onLogoutSuccess={() => onSuccess(false)}
-            onFailure={onFailure}
-            cookiePolicy={'single_host_origin'}
-            isSignedIn={true}
-        /> */}
-        Sign Out
-    </Button>
+        {/* <Button onClick={() => googleLogout()} id="signOutButton" className='m-3'>
+            {/* <googleLogout
+                clientId={CLIENT_ID}
+                buttonText="Logout"
+                onLogoutSuccess={() => onSuccess(false)}
+                onFailure={onFailure}
+                cookiePolicy={'single_host_origin'}
+                isSignedIn={true}
+            /> */}
+            {/* Sign Out
+        </Button> */}
     
     {documentId.length === 0 ? 
-    <Button className='customBtn' onClick={() => createFile()}>Create Doc</Button>
+    <Button className='customBtn m-3' onClick={() => createFile()}>Create Doc</Button>
     : 
     <>{documentLink.length === 0 ?
 
         <>{ sectionCountArr.length === 0 ?
-            <Form onSubmit={(e) => onSectionCountSubmit(e)}>
+            <Form onSubmit={(e) => onSectionCountSubmit(e)} className='m-3'>
                 <Form.Group className="mb-3" controlId="formBasicEmail">
                 <Form.Label>Initiate Proposal Outline Creation</Form.Label>
                 <Form.Control type="number" name="sections" placeholder="Enter number of sections (integers only)" />
@@ -399,7 +399,7 @@ return (<Row>
             </>
 
     : 
-        <Button target="_blank" rel="noopener noreferrer" href={documentLink}>Proposal Outline Link</Button>
+        <Button className="m-2" target="_blank" rel="noopener noreferrer" href={documentLink}>Proposal Outline Link</Button>
 
     }</>
     }</div>
@@ -407,24 +407,17 @@ return (<Row>
     : 
 
     <div id='signInButton'>
-        {/* <GoogleLogin
-            clientId={CLIENT_ID}
-            buttonText="Login"
-            onSuccess={() => onSuccess(true)}
-            onFailure={onFailure}
-            cookiePolicy={'single_host_origin'}
-            isSignedIn={true}
-        /> */}
+        <GoogleOAuthProvider clientId={process.env.REACT_APP_CLIENT_ID}>
         <GoogleLogin
             onSuccess={credentialResponse => {
                 onSuccess(true);
-                console.log(credentialResponse);
             }}
             onError={() => {
                 onFailure()
                 console.log('Login Failed');
             }}
         />
+        </GoogleOAuthProvider>
     </div>
     }
 </Col>
@@ -440,7 +433,7 @@ return (<Row>
 </Col>
 :
 <Col sm={10} className="vh-100 overflow-auto">
-<iframe style={{width:"100%",height:"100%"}} src="https://docs.google.com/document/d/e/2PACX-1vRRaaHNHexxLQOqtV1TWCbCdsTiKZ7MB1SJBEWNEDfPqAf1MGbMdTXN7FSe27tPjfOSO9xUYw2NpK7d/pub?embedded=true"></iframe>
+        Your Google Document Has Been Created (Click to Link Button on the Left)
 </Col>
 }
 </Row>

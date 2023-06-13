@@ -75,8 +75,8 @@ const [focusData, updateFocusData] = useState({
 
 
 const configuration = new Configuration({
-    organization: "org-QuYDdeJx68kBjwz6lLg7qZe4",
-    apiKey: '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',
+    organization: process.env.REACT_APP_ORG_KEY,
+    apiKey: process.env.REACT_APP_API_AI_KEY,
     });
 const openai = new OpenAIApi(configuration);
 
@@ -170,7 +170,7 @@ const handleDropOutline = async (e) => {
     var prompt = activeAiPrompt + ": "
     try {
         const result = await openai.createCompletion({
-          model: "text-davinci-003",
+          model: process.env.REACT_APP_MODEL,
           max_tokens: 1024,
           prompt: prompt.concat(specificComplianceItem.content_text),
         });
@@ -459,9 +459,9 @@ return (<>
         }
         </Dropdown.Menu>
     </Dropdown>
-    <Col style={{ padding: "3px", backgroundColor: "#AEBC37", borderRadius: "5px", marginLeft:'1vw', marginRight:'1vw'}} onDragOver={(e) => handleAllowDrop(e)} onDrop={(e) => handleDropCalendar(e)}>
+    {/* <Col style={{ padding: "3px", backgroundColor: "#AEBC37", borderRadius: "5px", marginLeft:'1vw', marginRight:'1vw'}} onDragOver={(e) => handleAllowDrop(e)} onDrop={(e) => handleDropCalendar(e)}>
         <FontAwesomeIcon size="2xl" icon={faCalendar} />
-    </Col>
+    </Col> */}
     <Col style={{ padding: "3px", backgroundColor: "#9ab6da", borderRadius: "5px", marginLeft:'1vw', marginRight:'1vw', maxWidth:'30vw'}} onDragOver={(e) => handleAllowDrop(e)} onDrop={(e) => handleDropOutline(e)}>
         <Dropdown>
             {activeAiPrompt.length === 0 ? <FontAwesomeIcon size="2xl" icon={faFileWord} /> : <></>}
@@ -492,7 +492,7 @@ return (<>
             </Dropdown.Menu>
         </Dropdown>
     </Col>
-    <Col style={{ padding: "3px", backgroundColor: '#f44336', borderRadius: "5px", marginLeft:'1vw', marginRight:'1vw'}} onDragOver={(e) => handleAllowDrop(e)} onDrop={(e) => handleDropDelete(e)}>
+    <Col style={{ padding: "3px", backgroundColor: '#f44336', borderRadius: "5px", marginLeft:'1vw', marginRight:'1vw', maxWidth:'30vw'}} onDragOver={(e) => handleAllowDrop(e)} onDrop={(e) => handleDropDelete(e)}>
         <FontAwesomeIcon size="2xl" icon={faTrashCan} />
     </Col>
 </Navbar>
@@ -514,7 +514,7 @@ return (<>
                                 </Popover>
                             }>
                             <ListGroup.Item className='d-flex justify-content-center' action name={item.id} key={index} href={`#link${index}`} draggable='true' onDragStart={(e) => handleDrag(e)} onDoubleClick={() => handleFocus(item.id)}>
-                                <FontAwesomeIcon onClick={() => handleFlagged(item.id)} style={{paddingRight:'1vw'}} color={item.flagged} size="sm" icon={faFlag} />
+                                <FontAwesomeIcon onClick={() => handleFlagged(item.id)} style={{}} color={item.flagged} size="sm" icon={faFlag} />
                                 <div>{item.title_text}</div>
                             </ListGroup.Item>
                         </OverlayTrigger>

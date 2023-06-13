@@ -1,9 +1,15 @@
+import Alert from 'react-bootstrap/Alert';
+import { Container } from 'react-bootstrap';
+
 function Home() {
 const user = localStorage.getItem('username');
 return (<>{user ? 
-<header className="App-header">
-    Welcome to the FH Proper Application <h1 style={{color: '#AEBC37'}}>{user}</h1>
+<Container className="App-header">
+<header>
+    Welcome to the Proposer Application
 </header>
+<Alert style={{marginTop:"10px"}} variant='primary'>{user}</Alert>
+</Container>
 :
 <></>
 }</>);
