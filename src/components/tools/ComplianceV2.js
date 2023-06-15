@@ -49,7 +49,6 @@ useEffect(() => {
     })
     .then((res) => {
       updateProposalData(res.data);
-      console.log(res.data.complianceimages_set)
       updateComplianceData(res.data.complianceimages_set);
       updateSectionData(res.data.compliance_sections);
     });
@@ -372,12 +371,12 @@ return (<>
                         {editMode ? 
                         <Container>
                         <input style={{maxWidth:"10vw"}} onChange={handleChangeProposalTitle} type="text" placeholder={proposalData.title}/>
-                        <div onClick={()=>handleEditMode(false)} ><FontAwesomeIcon icon={faFloppyDisk} size="s"/></div>
+                        <div onClick={()=>handleEditMode(false)} ><FontAwesomeIcon icon={faFloppyDisk} size="xs"/></div>
                         </Container>
                         : 
                         <Container>
                         {proposalData.title}
-                        <div onClick={()=>handleEditMode(true)} ><FontAwesomeIcon icon={faPenToSquare} size="s"/></div>
+                        <div onClick={()=>handleEditMode(true)} ><FontAwesomeIcon icon={faPenToSquare} size="xs"/></div>
                         </Container>
                         }
                 </Container>

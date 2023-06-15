@@ -32,7 +32,6 @@ function App() {
     })
     .then((res) => {
       const apiRes = res.data;
-      console.log(res.data)
       setProposalData({ loading: false, res: apiRes, exampleproposal: apiRes["0"] });
     });
   }, [setProposalData, navigate]);

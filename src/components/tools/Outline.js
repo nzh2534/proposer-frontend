@@ -4,17 +4,18 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/esm/Button';
 import ListGroup from 'react-bootstrap/ListGroup';
 import { useEffect, useState } from 'react';
-import { GoogleLogin} from '@react-oauth/google';
 import { gapi } from 'gapi-script';
 import axiosInstance from '../../axios';
-import { GoogleOAuthProvider } from '@react-oauth/google';
+import GoogleButton from 'react-google-button'
 
 const API_KEY = process.env.REACT_APP_API_GOOGLE_KEY
 
 function Outline({textArray, proposalData}) {
     var testHeader = "\nCOVER PAGE"
     var instructionText = "\n\nINSTRUCTIONS FOR THIS DOCUMENT:\n(1) All highlighted text should eventually be deleted\n"
-    const [googleLoggedIn, updateGoogleLoggedIn] = useState(false);  
+    const [googleLoggedIn, updateGoogleLoggedIn] = useState(false);
+    const [authCred, updateAuthCred] = useState("");
+    const [tokenClient, setTokenClient] = useState({});
     const [sectionCountArr, updateSectionCountArr] = useState([]);
     const [outlineContent, updateOutlineContent] = useState(false);
     const [documentId, updateDocumentId] = useState(proposalData.proposal_id);
@@ -52,33 +53,46 @@ function Outline({textArray, proposalData}) {
             },
         ])
 
-    const onSuccess = (res) => {
-        console.log("Login Success!")
-        updateGoogleLoggedIn(res);
-        gapi.load('client:auth2', start);
-    }
-
-    const onFailure = (res) => {
-        console.log("Login Failed!")
-    }
-
     function start(){
-        console.log(gapi)
         gapi.client.init({
             apiKey: process.env.REACT_APP_API_GOOGLE_KEY,
             clientId: process.env.REACT_APP_CLIENT_ID,
             scope: process.env.REACT_APP_SCOPES_GOOGLE
         })
-        console.log(gapi)
     };
 
+    function handleCallbackResponse(){
+        console.log("init")
+    };
+
+
+
     useEffect(() => {
+        /* global google */
+        const google = window.google;
+        google.accounts.id.initialize({
+            client_id: process.env.REACT_APP_CLIENT_ID,
+            callback: handleCallbackResponse
+        });
+
+        //tokenClient
+        setTokenClient(google.accounts.oauth2.initTokenClient({
+            client_id: process.env.REACT_APP_CLIENT_ID,
+            scope: process.env.REACT_APP_SCOPES_GOOGLE,
+            callback: (tokenResponse) => {
+                updateGoogleLoggedIn(true);
+                updateAuthCred(tokenResponse.access_token);
+            }
+        }));
+
+
         gapi.load('client:auth2', start);
-    })
+    }, [])
 
     const createFile = () => {
-        var accessToken = gapi.auth.getToken().access_token;
-        var body = {title: "GAPI COPY"};
+        // var accessToken = gapi.auth.getToken().access_token;
+        // var body = {title: "GAPI COPY"};
+
         var request = gapi.client.request({
             'path': process.env.REACT_APP_TEMPLATE_PATH,
             'method': 'POST'
@@ -94,22 +108,20 @@ function Outline({textArray, proposalData}) {
                 })
                 .catch((error) => {
                     console.log(error.response)
+                    updateGoogleLoggedIn(false);
                 })
                 .then((res) => {
                     console.log(res)
                 });
-            console.log('Copy ID: ' + resp.id);
 
             fetch(`https://docs.googleapis.com/v1/documents/${resp.id}`, {
             method: "GET",
             headers: new Headers({
-                'Authorization': 'Bearer ' + accessToken
+                'Authorization': 'Bearer ' + authCred
             }),
             }).then( (res)=> {
                 return res.json();
             }).then(function(val){
-                console.log(val)
-                console.log(Object.keys(val.headers)[1])
                 updateHeaderId(Object.keys(val.headers))
         });
         });
@@ -117,12 +129,11 @@ function Outline({textArray, proposalData}) {
     }
 
     const updateFile = (requests) => {
-        var accessToken = gapi.auth.getToken().access_token;
-
+        // var accessToken = gapi.auth.getToken().access_token;
         fetch(`https://docs.googleapis.com/v1/documents/${documentId}:batchUpdate?key=${API_KEY}`, {
             method: "POST",
             headers: new Headers({
-                'Authorization': 'Bearer ' + accessToken,
+                'Authorization': 'Bearer ' + authCred,
                 "Content-Type": "application/json",
             }),
             body: JSON.stringify({
@@ -130,12 +141,14 @@ function Outline({textArray, proposalData}) {
               }),
         }).then( (res)=> {
             return res.json();
-        })
-        .then((val) => {
+        }).catch((error) => {
+            console.log(error.response)
+            updateGoogleLoggedIn(false);
+        }).then((val) => {
             fetch(`https://docs.googleapis.com/v1/documents/${documentId}:batchUpdate?key=${API_KEY}`, {
             method: "POST",
             headers: new Headers({
-                'Authorization': 'Bearer ' + accessToken,
+                'Authorization': 'Bearer ' + authCred,
                 "Content-Type": "application/json",
             }),
             body: JSON.stringify({
@@ -353,18 +366,6 @@ return (<Row>
 <Col sm={2} className="vh-100 overflow-auto d-flex align-items-center justify-content-center" style={{borderRight: '5px solid gray'}}>
 {googleLoggedIn ? 
     <div className="vh-100 d-flex flex-column">
-        {/* <Button onClick={() => googleLogout()} id="signOutButton" className='m-3'>
-            {/* <googleLogout
-                clientId={CLIENT_ID}
-                buttonText="Logout"
-                onLogoutSuccess={() => onSuccess(false)}
-                onFailure={onFailure}
-                cookiePolicy={'single_host_origin'}
-                isSignedIn={true}
-            /> */}
-            {/* Sign Out
-        </Button> */}
-    
     {documentId.length === 0 ? 
     <Button className='customBtn m-3' onClick={() => createFile()}>Create Doc</Button>
     : 
@@ -384,7 +385,7 @@ return (<Row>
             <Form onSubmit={(e) => onProposalOutlineSubmit(e)}>
             {sectionCountArr.map((item, index)=>{
                 return(
-                <Form.Group className="mb-3" controlId={item}>
+                <Form.Group className="mb-3" key={index} controlId={item}>
                     <Form.Label>{`Section ${item} Name`}</Form.Label>
                     <Form.Control type="text" name={`${item}_name`} placeholder={`Enter Section #${item}`} />
                     <Form.Control type="number" name={`${item}_pages`} placeholder={`Enter Page #${item}`} />
@@ -404,28 +405,18 @@ return (<Row>
     }</>
     }</div>
 
-    : 
+     : 
 
-    <div id='signInButton'>
-        <GoogleOAuthProvider clientId={process.env.REACT_APP_CLIENT_ID}>
-        <GoogleLogin
-            onSuccess={credentialResponse => {
-                onSuccess(true);
-            }}
-            onError={() => {
-                onFailure()
-                console.log('Login Failed');
-            }}
-        />
-        </GoogleOAuthProvider>
+     <div id='signInButton'>
+        <GoogleButton style={{width:"50px", marginBottom: "20vh"}} onClick={() => tokenClient.requestAccessToken()} />
     </div>
     }
 </Col>
 {documentLink.length === 0 ?
 <Col sm={10} className="vh-100 overflow-auto">
         {textArray.map((item, index)=>{
-            return <ListGroup className='m-2'>
-                        <ListGroup.Item action name={item} key={index} id={index} href={`#link${index}`} draggable='true' onDragStart={(e) => handleDrag(e)}>
+            return <ListGroup className='m-2' key={index}>
+                        <ListGroup.Item action name={item} id={index} href={`#link${index}`} draggable='true' onDragStart={(e) => handleDrag(e)}>
                             <div>{index + 1}</div>{item}
                         </ListGroup.Item>
                    </ListGroup>
