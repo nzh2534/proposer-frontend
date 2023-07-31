@@ -636,14 +636,17 @@ return (<>
                                     </Popover.Body>
                                 </Popover>
                             }>
+                            {(item.content_text.length === 0 || item.content_text === "\f") ?
+                            <ListGroup.Item className='d-flex justify-content-center bg-dark' action name={item.id} key={index} href={`#link${index}`} draggable='false' onDragStart={(e) => handleDrag(e)} onDoubleClick={() => handleFocus(item.id)}>
+                                <FontAwesomeIcon onClick={() => handleFlagged(item.id)} style={{marginRight:"2px"}} color={item.flagged} size="sm" icon={faFlag} />
+                                <img src={item.title} name={item.id} alt={index} style={{maxWidth: "50vh", height: "auto", borderRadius:"5px"}}/>
+                            </ListGroup.Item>
+                            :
                             <ListGroup.Item className='d-flex justify-content-center' action name={item.id} key={index} href={`#link${index}`} draggable='true' onDragStart={(e) => handleDrag(e)} onDoubleClick={() => handleFocus(item.id)}>
                                 <FontAwesomeIcon onClick={() => handleFlagged(item.id)} style={{marginRight:"2px"}} color={item.flagged} size="sm" icon={faFlag} />
-                                {panelRight ?
                                 <img src={item.title} name={item.id} alt={index} style={{maxWidth: "50vh", height: "auto", borderRadius:"5px"}}/>
-                                :
-                                <img src={item.title} name={item.id} alt={index} style={{maxWidth: "50vh", height: "auto", borderRadius:"5px"}}/>
-                                }   
                             </ListGroup.Item>
+                            }
                         </OverlayTrigger>
             })}
             </ListGroup>
