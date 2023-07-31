@@ -207,6 +207,7 @@ const handleDropDelete = (e) => {
         return obj.id !== parseInt(id)
     })
     updateComplianceData(filteredComplianceArray)
+    updateComplianceDataOriginal(filteredComplianceArray)
     axiosInstance
         .delete(`proposals/${pk}/compliance/${id}/delete/`)
         .catch((error) => {
