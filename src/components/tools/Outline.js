@@ -347,7 +347,7 @@ const handleAllowDrop = (e) => {
 const handleDropContent = (e) => {
     const content = e.dataTransfer.getData('name');
     const id = parseInt(e.dataTransfer.getData('id')) + 1;
-    let previousContent = outlineContent
+    let previousContent = {...outlineContent}
     console.log(id) //which item in list
     console.log(e.target.name.split("_")[0]) //which section
     if(e.target.name.split("_")[0] in previousContent){

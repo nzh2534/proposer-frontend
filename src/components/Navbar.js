@@ -8,7 +8,7 @@ function CollapsibleNavbar({count}) {
   const username = localStorage.getItem('username')
 
   return (
-    <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
+    <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark" style={{width: '100%'}}>
       <Container className='ms-0 w-auto'>
         <Navbar.Brand href="/">
         <img
