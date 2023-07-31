@@ -55,12 +55,15 @@ useEffect(() => {
       console.log(error)
     })
     .then((res) => {
-      updateProposalData(res.data);
-      updateComplianceData(res.data.complianceimages_set);
-      updateComplianceDataOriginal(res.data.complianceimages_set);
-      updateSectionData(res.data.compliance_sections);
-      updateChecklistData(res.data.checklist);
-      console.log(res)
+      var resDataCopy = {...res.data};
+      resDataCopy.complianceimages_set.sort((a, b) => a.id - b.id);
+      updateProposalData(resDataCopy);
+      updateComplianceData(resDataCopy.complianceimages_set);
+      updateComplianceDataOriginal(resDataCopy.complianceimages_set);
+      updateSectionData(resDataCopy.compliance_sections);
+      updateChecklistData(resDataCopy.checklist);
+      console.log(res);
+      console.log(resDataCopy);
     });
   }, [updateProposalData, pk]);
 
