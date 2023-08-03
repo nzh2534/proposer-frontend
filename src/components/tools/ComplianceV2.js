@@ -14,7 +14,7 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Popover from 'react-bootstrap/Popover';
 
-import { faPenToSquare ,faTrashCan, faUndo, faCalendar, faFileWord, faPlus, faX, faFloppyDisk, faClockRotateLeft, faFlag, faArrowRight, faArrowLeft, faFileExcel } from "@fortawesome/free-solid-svg-icons";
+import { faPenToSquare ,faTrashCan, faUndo, faCalendar, faFileWord, faPlus, faX, faFloppyDisk, faClockRotateLeft, faFlag, faArrowRight, faArrowLeft, faFileCsv } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import Tabs from 'react-bootstrap/Tabs';
@@ -26,6 +26,7 @@ import Form from 'react-bootstrap/Form';
 import Outline from './Outline';
 import Table from 'react-bootstrap/Table';
 import InputGroup from 'react-bootstrap/InputGroup';
+import CsvDownloadButton from 'react-json-to-csv'
 
 
 function ComplianceListV2() {
@@ -157,6 +158,11 @@ const handleDrag = (e) => {
     e.dataTransfer.setData('name', e.target.name);
 }
 
+const handleDragSection = (e, id) => {
+    console.log(id);
+    e.dataTransfer.setData('sec_id', id);
+}
+
 const handleAllowDrop = (e) => {
     e.preventDefault();
 }
@@ -188,34 +194,90 @@ const handleDropOutline = async (e) => {
 }
 
 const handleDropSection = async (e) => {
-    var id = e.dataTransfer.getData('name');
-    const cklistcopy = [...checklistData];
-    console.log(e.target.name);
-    var specificComplianceItem = complianceData.find((item)=>{
-        return item.id === parseInt(id)
-    });
-    const objIndex = cklistcopy.findIndex((obj => obj.id === parseInt(e.target.name)));
-    cklistcopy[objIndex].data = cklistcopy[objIndex].data.concat(specificComplianceItem.content_text, "\n")
-    cklistcopy[objIndex].pages = cklistcopy[objIndex].pages.concat(specificComplianceItem.page_number, ", ")
-    console.log(cklistcopy)
-    updateChecklistData(cklistcopy)
+    if(e.dataTransfer.getData('name')){
+        var id = e.dataTransfer.getData('name');
+        const cklistcopy = [...checklistData];
+        console.log(e.target.name);
+        var specificComplianceItem = complianceData.find((item)=>{
+            return item.id === parseInt(id)
+        });
+        const objIndex = cklistcopy.findIndex((obj => obj.id === parseInt(e.target.name)));
+        cklistcopy[objIndex].data = cklistcopy[objIndex].data.concat(specificComplianceItem.content_text, "\n")
+        cklistcopy[objIndex].pages = cklistcopy[objIndex].pages.concat(specificComplianceItem.page_number, ", ")
+        console.log(cklistcopy)
+        updateChecklistData(cklistcopy)
+    } else {
+        console.log("second")
+        var current = parseInt(e.dataTransfer.getData('sec_id'));
+        var target = parseInt(e.target.name.split("_")[0]);
+        console.log(current); //current
+        console.log(target); //target
+        const cklistcopy = [...checklistData];
+        const newcklist = [];
+        if(current > target){
+            cklistcopy.map((item)=>{
+                if(item.id < target){
+                    newcklist.push(item);
+                } else if(item.id === current){
+                    var itemCopy = {...item};
+                    itemCopy.id = target;
+                    newcklist.push(itemCopy);
+                } else if(item.id >= target && item.id < current){
+                    var itemCopy = {...item};
+                    itemCopy.id += 1;
+                    newcklist.push(itemCopy);
+                } else {
+                    newcklist.push(item);
+                }
+            })
+            newcklist.sort((a, b) => a.id - b.id);
+            console.log(newcklist)
+        } else {
+            cklistcopy.map((item)=>{
+                if(item.id < current){
+                    newcklist.push(item);
+                } else if(item.id === current){
+                    var itemCopy = {...item};
+                    itemCopy.id = target - 1;
+                    newcklist.push(itemCopy);
+                } else if(item.id > current && item.id < target){
+                    var itemCopy = {...item};
+                    itemCopy.id -= 1;
+                    newcklist.push(itemCopy);
+                } else {
+                    newcklist.push(item);
+                }
+            })
+            newcklist.sort((a, b) => a.id - b.id);
+            console.log(newcklist)
+        }
+        updateChecklistData(newcklist)
+    }
 }
 
 const handleDropDelete = (e) => {
-    const id = e.dataTransfer.getData('name');
-    const filteredComplianceArray = complianceData.filter(obj =>{
-        return obj.id !== parseInt(id)
-    })
-    updateComplianceData(filteredComplianceArray)
-    updateComplianceDataOriginal(filteredComplianceArray)
-    axiosInstance
-        .delete(`proposals/${pk}/compliance/${id}/delete/`)
-        .catch((error) => {
-            console.log(error.response)
+    if(e.dataTransfer.getData('name')){
+        const id = e.dataTransfer.getData('name');
+        const filteredComplianceArray = complianceData.filter(obj =>{
+            return obj.id !== parseInt(id)
         })
-        .then((res) => {
-            console.log(res)
-        });
+        updateComplianceData(filteredComplianceArray)
+        updateComplianceDataOriginal(filteredComplianceArray)
+        axiosInstance
+            .delete(`proposals/${pk}/compliance/${id}/delete/`)
+            .catch((error) => {
+                console.log(error.response)
+            })
+            .then((res) => {
+                console.log(res)
+            });
+    } else {
+        const id = e.dataTransfer.getData('sec_id');
+        const filteredChecklistArray = checklistData.filter(obj =>{
+            return obj.id !== parseInt(id)
+        })
+        updateChecklistData(filteredChecklistArray)
+    }
 }
 
 // const handleSubmit = (e) => {
@@ -410,7 +472,7 @@ const handleSaveChecklist = () => {
     });
 }
 
-// const handleSheetsExport = () => {
+// const handleCsvExport = () => {
 
 // }
 
@@ -581,11 +643,11 @@ return (<>
 <Tab.Container id="list-group-tabs" defaultActiveKey="#link1">
     <Row>
         {panelRight ?
-        <Col sm={8} className="vh-100 d-flex justify-content-center overflow-auto" style={{ maxHeight: "90vh" }}>
+        <Col sm={8} className="vh-100 d-flex justify-content-center overflow-scroll" style={{ maxHeight: "90vh" }}>
             <Form style={{ width: "100%" }}>
                 <Button style={{marginBottom:"1vh"}} onClick={() => handleAddToChecklist()}><FontAwesomeIcon size="sm" icon={faPlus} /></Button>
                 <Button style={{marginBottom:"1vh", marginLeft:"1vh", marginRight:"1vh"}} onClick={() => handleSaveChecklist()}><FontAwesomeIcon size="sm" icon={faFloppyDisk} /></Button>
-                {/* <Button style={{marginBottom:"1vh"}} onClick={() => handleSheetsExport()}><FontAwesomeIcon size="sm" icon={faFileExcel} /></Button> */}
+                <CsvDownloadButton style={{marginBottom:"1vh"}} className="btn btn-primary" data={checklistData} delimiter=','><FontAwesomeIcon size="sm" icon={faFileCsv} /></CsvDownloadButton>
                 <Table striped bordered hover>
                     <thead>
                         <tr>
@@ -596,11 +658,11 @@ return (<>
                     </thead>
                     <tbody>
                     {checklistData?.map((item, index)=>{
-                    return <tr>
+                    return <tr key={index} name={item.id.toString().concat("_item")}>
                                 <td style={{maxWidth:"10vh"}}>
                                     <Form.Control name={item.id.toString().concat("_pages")} as="textarea" value={item.pages} onChange={(e) => handleChecklistChange(e)}/>
                                 </td>
-                                <td style={{maxWidth:"20vh"}}>
+                                <td style={{maxWidth:"20vh", cursor:"grab"}} draggable onDragStart={(e) => handleDragSection(e, item.id)} onDragOver={(e) => handleAllowDrop(e)} onDrop={(e) => handleDropSection(e)}>
                                     <Form.Control name={item.id.toString().concat("_item")} as="textarea" value={item.item} onChange={(e) => handleChecklistChange(e)}/>
                                 </td>
                                 <td>
