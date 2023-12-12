@@ -407,7 +407,7 @@ return (<Row>
 
      : 
 
-     <div id='signInButton'>
+    <div id='signInButton'>
         <GoogleButton style={{width:"50px", marginBottom: "20vh"}} onClick={() => tokenClient.requestAccessToken()} />
     </div>
     }
