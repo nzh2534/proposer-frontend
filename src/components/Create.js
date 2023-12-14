@@ -5,15 +5,7 @@ import React, { useState } from "react";
 import axiosInstance from "../axios";
 import { useNavigate } from "react-router-dom";
 import { Col, Row } from "react-bootstrap";
-// import Loading from './Loading';
 
-function Create({ proposals }) {
-  // const remove = ["url","edit_url", "pk", "event_set", "word_analysis", "compliance"]
-  // const deleteitems = proposals ? remove.map((item) => {delete proposals[item]}) : null
-  // const arr = proposals ? Object.keys(proposals) : null
-  // const values = proposals ? Object.values(proposals) : null
-  // const typesarr = []
-  // const types = values ? values.map((value) => {typesarr.push(typeof(value))}) : null
 
   const navigate = useNavigate();
   const [formData, updateFormData] = useState({});
@@ -47,13 +39,6 @@ function Create({ proposals }) {
       });
   };
 
-  // {arr ?
-  // 	arr.map((key, index) => {
-  // 		return <Form.Group className="mb-3" key={index}>
-  // 		<Form.Label>{key}</Form.Label>
-  // 		<Form.Control type={key} label={"Enter " + key} name={key} onChange={handleChange}/>
-  // 	  </Form.Group>
-  // }) : <Loading />}
   return (
     <Form
       style={{ marginRight: "100px", marginLeft: "100px", marginTop: "5vh" }}
