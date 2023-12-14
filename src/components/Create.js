@@ -84,11 +84,10 @@ function Create({ proposals }) {
 
           <Form.Group className="mb-3 form-group">
             <Form.Label>Donor</Form.Label>
-            <Form.Control
+            <Form.Select
               type="text"
               label="donor"
               name="donor"
-              as="select"
               onChange={handleChange}
             >
               <option value=""></option>
@@ -96,15 +95,14 @@ function Create({ proposals }) {
               <option value="USDOS">USDOS</option>
               <option value="KOICA">KOICA</option>
               <option value="Other">Other</option>
-            </Form.Control>
+            </Form.Select>
           </Form.Group>
           <Form.Group className="mb-3 form-group">
             <Form.Label>Priority</Form.Label>
-            <Form.Control
+            <Form.Select
               type="text"
               label="priority"
               name="priority"
-              as="select"
               onChange={handleChange}
             >
               <option value=""></option>
@@ -112,21 +110,20 @@ function Create({ proposals }) {
               <option value="Normal">Normal</option>
               <option value="High">High</option>
               <option value="Critical">Critical</option>
-            </Form.Control>
+            </Form.Select>
           </Form.Group>
           <Form.Group className="mb-3 form-group">
             <Form.Label>Assigned</Form.Label>
-            <Form.Control
+            <Form.Select
               type="text"
               label="assigned"
               name="assigned"
-              as="select"
               onChange={handleChange}
             >
               <option value=""></option>
               <option value="Momodu">Momodu</option>
               <option value="Claude">Claude</option>
-            </Form.Control>
+            </Form.Select>
           </Form.Group>
         </Col>
       </Row>
