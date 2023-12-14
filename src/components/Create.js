@@ -6,7 +6,9 @@ import axiosInstance from "../axios";
 import { useNavigate } from "react-router-dom";
 import { Col, Row } from "react-bootstrap";
 
+import "./Create.css";
 
+function Create({ proposals }) {
   const navigate = useNavigate();
   const [formData, updateFormData] = useState({});
 
@@ -41,12 +43,28 @@ import { Col, Row } from "react-bootstrap";
 
   return (
     <Form
-      style={{ marginRight: "100px", marginLeft: "100px", marginTop: "5vh" }}
+      style={{
+        marginRight: "100px",
+        marginLeft: "100px",
+        marginTop: "5vh",
+      }}
     >
       <Row className="d-flex align-items-center justify-content-center">
-        <Col>
-          <Form.Group className="mb-3">
-            <Form.Label>Title</Form.Label>
+        <Col
+          style={{
+            maxWidth: "500px",
+            backgroundColor: "hsl(1,0%,90%)",
+            padding: "20px",
+            borderRadius: "7px",
+            margin: "10px",
+          }}
+        >
+          <Form.Label style={{ fontSize: "20px" }}>
+            Create a new proposal
+          </Form.Label>
+          <hr />
+          <Form.Group className="mb-3 form-group">
+            <Form.Label className="form-label">Title</Form.Label>
             <Form.Control
               type="textarea"
               label="title"
@@ -54,7 +72,7 @@ import { Col, Row } from "react-bootstrap";
               onChange={handleChange}
             />
           </Form.Group>
-          <Form.Group className="mb-3">
+          <Form.Group className="mb-3 form-group">
             <Form.Label>Description</Form.Label>
             <Form.Control
               type="textarea"
@@ -63,9 +81,8 @@ import { Col, Row } from "react-bootstrap";
               onChange={handleChange}
             />
           </Form.Group>
-        </Col>
-        <Col>
-          <Form.Group className="mb-3">
+
+          <Form.Group className="mb-3 form-group">
             <Form.Label>Donor</Form.Label>
             <Form.Control
               type="text"
@@ -81,7 +98,7 @@ import { Col, Row } from "react-bootstrap";
               <option value="Other">Other</option>
             </Form.Control>
           </Form.Group>
-          <Form.Group className="mb-3">
+          <Form.Group className="mb-3 form-group">
             <Form.Label>Priority</Form.Label>
             <Form.Control
               type="text"
@@ -97,7 +114,7 @@ import { Col, Row } from "react-bootstrap";
               <option value="Critical">Critical</option>
             </Form.Control>
           </Form.Group>
-          <Form.Group className="mb-3">
+          <Form.Group className="mb-3 form-group">
             <Form.Label>Assigned</Form.Label>
             <Form.Control
               type="text"
