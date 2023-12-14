@@ -213,15 +213,15 @@ function ComplianceListV2() {
         return item.id === parseInt(id);
       });
       const objIndex = cklistcopy.findIndex(
-        (obj) => obj.id === parseInt(e.target.name)
+        (obj) => obj.id === parseInt(e.target.name),
       );
       cklistcopy[objIndex].data = cklistcopy[objIndex].data.concat(
         specificComplianceItem.content_text,
-        "\n"
+        "\n",
       );
       cklistcopy[objIndex].pages = cklistcopy[objIndex].pages.concat(
         specificComplianceItem.page_number,
-        ", "
+        ", ",
       );
       console.log(cklistcopy);
       updateChecklistData(cklistcopy);
@@ -358,7 +358,7 @@ function ComplianceListV2() {
       updateActiveSectionData("Flagged Content");
       const complianceDataCopy = complianceData;
       const filteredComplianceData = complianceDataCopy.filter((item) =>
-        item.flagged.includes("red")
+        item.flagged.includes("red"),
       );
       updateComplianceData(filteredComplianceData);
     } else {
@@ -367,7 +367,7 @@ function ComplianceListV2() {
       var filteredComplianceData = complianceData.filter(
         (item) =>
           item.page_number >= filterPages[0] &&
-          item.page_number <= filterPages[1]
+          item.page_number <= filterPages[1],
       );
       updateComplianceData(filteredComplianceData);
     }
@@ -481,7 +481,7 @@ function ComplianceListV2() {
     var checklistCopy = [...checklistData];
     const items = e.target.name.split("_");
     const index = checklistCopy.findIndex(
-      (obj) => obj.id === parseInt(items[0])
+      (obj) => obj.id === parseInt(items[0]),
     );
     checklistCopy[index][items[1]] = e.target.value;
     console.log(checklistCopy);
@@ -699,7 +699,7 @@ function ComplianceListV2() {
                                         {sectionData[item][1]}
                                       </Dropdown.Item>
                                     );
-                                  }
+                                  },
                                 )}
                                 <Dropdown.Item
                                   name="flagged"
@@ -767,10 +767,10 @@ function ComplianceListV2() {
                                     <Dropdown.Item
                                       onClick={() => {
                                         updateComplianceData(
-                                          proposalData.complianceimages_set
+                                          proposalData.complianceimages_set,
                                         );
                                         updateActiveSectionData(
-                                          "Section Filters"
+                                          "Section Filters",
                                         );
                                       }}
                                     >
@@ -847,7 +847,7 @@ function ComplianceListV2() {
                                             key={index}
                                             onClick={() =>
                                               updateActiveAiPrompt(
-                                                aiPrompts[item]
+                                                aiPrompts[item],
                                               )
                                             }
                                           >
@@ -855,7 +855,7 @@ function ComplianceListV2() {
                                           </Button>
                                         </Container>
                                       );
-                                    }
+                                    },
                                   )}
                                   {addingPrompt.adding ? (
                                     <Container
@@ -877,7 +877,7 @@ function ComplianceListV2() {
                                         <Dropdown.Item
                                           onClick={() =>
                                             handleSavePrompt(
-                                              addingPrompt.prompt
+                                              addingPrompt.prompt,
                                             )
                                           }
                                         >
