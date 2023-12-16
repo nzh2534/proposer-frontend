@@ -22,7 +22,7 @@ function CollapsibleNavbar({ count }) {
             width="120"
             height="60"
             className="rounded"
-            alt="FH Proposer Logo"
+            alt="Proposer Logo"
           />
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
