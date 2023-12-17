@@ -366,73 +366,130 @@ function Outline({ textArray, proposalData }) {
     console.log(previousContent);
     updateOutlineContent(previousContent);
   };
-return (<Row>
-<Col sm={2} className="vh-100 overflow-auto d-flex align-items-center justify-content-center" style={{borderRight: '5px solid gray'}}>
-{googleLoggedIn ? 
-    <div className="vh-100 d-flex flex-column">
-    {documentId.length === 0 ? 
-    <Button className='customBtn m-3' onClick={() => createFile()}>Create Doc</Button>
-    : 
-    <>{documentLink.length === 0 ?
-
-        <>{ sectionCountArr.length === 0 ?
-            <Form onSubmit={(e) => onSectionCountSubmit(e)} className='m-3'>
-                <Form.Group className="mb-3" controlId="formBasicEmail">
-                <Form.Label>Initiate Proposal Outline Creation</Form.Label>
-                <Form.Control type="number" name="sections" placeholder="Enter number of sections (integers only)" />
-                </Form.Group>
-                <Button variant="primary" type="submit">
-                    Submit
-                </Button>
-            </Form>
-            : 
-            <Form onSubmit={(e) => onProposalOutlineSubmit(e)}>
-            {sectionCountArr.map((item, index)=>{
-                return(
-                <Form.Group className="mb-3" key={index} controlId={item}>
-                    <Form.Label>{`Section ${item} Name`}</Form.Label>
-                    <Form.Control type="text" name={`${item}_name`} placeholder={`Enter Section #${item}`} />
-                    <Form.Control type="number" name={`${item}_pages`} placeholder={`Enter Page #${item}`} />
-                    <Form.Control disabled onDragOver={(e) => handleAllowDrop(e)} onDrop={(e) => handleDropContent(e)} name={`${item}_content`} placeholder={Object.keys(outlineContent[item]).toString()}/>
-                </Form.Group>)
-            })}
-            <Button variant="primary" type="submit">
-                Submit
-            </Button>
-            </Form>
-            }
-            </>
-
-    : 
-        <Button className="m-2" target="_blank" rel="noopener noreferrer" href={documentLink}>Proposal Outline Link</Button>
-
-    }</>
-    }</div>
-
-     : 
-
-    <div id='signInButton'>
-        <GoogleButton style={{width:"50px", marginBottom: "20vh"}} onClick={() => tokenClient.requestAccessToken()} />
-    </div>
-    }
-</Col>
-{documentLink.length === 0 ?
-<Col sm={10} className="vh-100 overflow-auto">
-        {textArray.map((item, index)=>{
-            return <ListGroup className='m-2' key={index}>
-                        <ListGroup.Item action name={item} id={index} href={`#link${index}`} draggable='true' onDragStart={(e) => handleDrag(e)}>
-                            <div>{index + 1}</div>{item}
-                        </ListGroup.Item>
-                   </ListGroup>
-        })}
-</Col>
-:
-<Col sm={10} className="vh-100 overflow-auto">
-        Your Google Document Has Been Created (Click to Link Button on the Left)
-</Col>
-}
-</Row>
-);
+  return (
+    <Row>
+      <Col
+        sm={2}
+        className="vh-100 overflow-auto d-flex align-items-center justify-content-center"
+        style={{ borderRight: "5px solid gray" }}
+      >
+        {googleLoggedIn ? (
+          <div className="vh-100 d-flex flex-column">
+            {documentId.length === 0 ? (
+              <Button className="customBtn m-3" onClick={() => createFile()}>
+                Create Doc
+              </Button>
+            ) : (
+              <>
+                {documentLink.length === 0 ? (
+                  <>
+                    {sectionCountArr.length === 0 ? (
+                      <Form
+                        onSubmit={(e) => onSectionCountSubmit(e)}
+                        className="m-3"
+                      >
+                        <Form.Group className="mb-3" controlId="formBasicEmail">
+                          <Form.Label>
+                            Initiate Proposal Outline Creation
+                          </Form.Label>
+                          <Form.Control
+                            type="number"
+                            name="sections"
+                            placeholder="Enter number of sections (integers only)"
+                          />
+                        </Form.Group>
+                        <Button variant="primary" type="submit">
+                          Submit
+                        </Button>
+                      </Form>
+                    ) : (
+                      <Form onSubmit={(e) => onProposalOutlineSubmit(e)}>
+                        {sectionCountArr.map((item, index) => {
+                          return (
+                            <Form.Group
+                              className="mb-3"
+                              key={index}
+                              controlId={item}
+                            >
+                              <Form.Label>{`Section ${item} Name`}</Form.Label>
+                              <Form.Control
+                                type="text"
+                                name={`${item}_name`}
+                                placeholder={`Enter Section #${item}`}
+                              />
+                              <Form.Control
+                                type="number"
+                                name={`${item}_pages`}
+                                placeholder={`Enter Page #${item}`}
+                              />
+                              <Form.Control
+                                disabled
+                                onDragOver={(e) => handleAllowDrop(e)}
+                                onDrop={(e) => handleDropContent(e)}
+                                name={`${item}_content`}
+                                placeholder={Object.keys(
+                                  outlineContent[item],
+                                ).toString()}
+                              />
+                            </Form.Group>
+                          );
+                        })}
+                        <Button variant="primary" type="submit">
+                          Submit
+                        </Button>
+                      </Form>
+                    )}
+                  </>
+                ) : (
+                  <Button
+                    className="m-2"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href={documentLink}
+                  >
+                    Proposal Outline Link
+                  </Button>
+                )}
+              </>
+            )}
+          </div>
+        ) : (
+          <div id="signInButton">
+            <GoogleButton
+              style={{ width: "50px", marginBottom: "20vh" }}
+              onClick={() => tokenClient.requestAccessToken()}
+            />
+          </div>
+        )}
+      </Col>
+      {documentLink.length === 0 ? (
+        <Col sm={10} className="vh-100 overflow-auto">
+          {textArray.map((item, index) => {
+            return (
+              <ListGroup className="m-2" key={index}>
+                <ListGroup.Item
+                  action
+                  name={item}
+                  id={index}
+                  href={`#link${index}`}
+                  draggable="true"
+                  onDragStart={(e) => handleDrag(e)}
+                >
+                  <div>{index + 1}</div>
+                  {item}
+                </ListGroup.Item>
+              </ListGroup>
+            );
+          })}
+        </Col>
+      ) : (
+        <Col sm={10} className="vh-100 overflow-auto">
+          Your Google Document Has Been Created (Click to Link Button on the
+          Left)
+        </Col>
+      )}
+    </Row>
+  );
 }
 
 export default Outline;
