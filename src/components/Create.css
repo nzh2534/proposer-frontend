@@ -1,0 +1,9 @@
+.form-group {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+}
+
+.form-label {
+  margin-left: 10px;
+}

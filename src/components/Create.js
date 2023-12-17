@@ -5,16 +5,10 @@ import React, { useState } from "react";
 import axiosInstance from "../axios";
 import { useNavigate } from "react-router-dom";
 import { Col, Row } from "react-bootstrap";
-// import Loading from './Loading';
+
+import "./Create.css";
 
 function Create({ proposals }) {
-  // const remove = ["url","edit_url", "pk", "event_set", "word_analysis", "compliance"]
-  // const deleteitems = proposals ? remove.map((item) => {delete proposals[item]}) : null
-  // const arr = proposals ? Object.keys(proposals) : null
-  // const values = proposals ? Object.values(proposals) : null
-  // const typesarr = []
-  // const types = values ? values.map((value) => {typesarr.push(typeof(value))}) : null
-
   const navigate = useNavigate();
   const [formData, updateFormData] = useState({});
 
@@ -47,21 +41,30 @@ function Create({ proposals }) {
       });
   };
 
-  // {arr ?
-  // 	arr.map((key, index) => {
-  // 		return <Form.Group className="mb-3" key={index}>
-  // 		<Form.Label>{key}</Form.Label>
-  // 		<Form.Control type={key} label={"Enter " + key} name={key} onChange={handleChange}/>
-  // 	  </Form.Group>
-  // }) : <Loading />}
   return (
     <Form
-      style={{ marginRight: "100px", marginLeft: "100px", marginTop: "5vh" }}
+      style={{
+        marginRight: "100px",
+        marginLeft: "100px",
+        marginTop: "5vh",
+      }}
     >
       <Row className="d-flex align-items-center justify-content-center">
-        <Col>
-          <Form.Group className="mb-3">
-            <Form.Label>Title</Form.Label>
+        <Col
+          style={{
+            maxWidth: "500px",
+            backgroundColor: "hsl(1,0%,90%)",
+            padding: "20px",
+            borderRadius: "7px",
+            margin: "10px",
+          }}
+        >
+          <Form.Label style={{ fontSize: "20px" }}>
+            Create a new proposal
+          </Form.Label>
+          <hr />
+          <Form.Group className="mb-3 form-group">
+            <Form.Label className="form-label">Title</Form.Label>
             <Form.Control
               type="textarea"
               label="title"
@@ -69,7 +72,7 @@ function Create({ proposals }) {
               onChange={handleChange}
             />
           </Form.Group>
-          <Form.Group className="mb-3">
+          <Form.Group className="mb-3 form-group">
             <Form.Label>Description</Form.Label>
             <Form.Control
               type="textarea"
@@ -78,15 +81,13 @@ function Create({ proposals }) {
               onChange={handleChange}
             />
           </Form.Group>
-        </Col>
-        <Col>
-          <Form.Group className="mb-3">
+
+          <Form.Group className="mb-3 form-group">
             <Form.Label>Donor</Form.Label>
-            <Form.Control
+            <Form.Select
               type="text"
               label="donor"
               name="donor"
-              as="select"
               onChange={handleChange}
             >
               <option value=""></option>
@@ -94,15 +95,14 @@ function Create({ proposals }) {
               <option value="USDOS">USDOS</option>
               <option value="KOICA">KOICA</option>
               <option value="Other">Other</option>
-            </Form.Control>
+            </Form.Select>
           </Form.Group>
-          <Form.Group className="mb-3">
+          <Form.Group className="mb-3 form-group">
             <Form.Label>Priority</Form.Label>
-            <Form.Control
+            <Form.Select
               type="text"
               label="priority"
               name="priority"
-              as="select"
               onChange={handleChange}
             >
               <option value=""></option>
@@ -110,21 +110,20 @@ function Create({ proposals }) {
               <option value="Normal">Normal</option>
               <option value="High">High</option>
               <option value="Critical">Critical</option>
-            </Form.Control>
+            </Form.Select>
           </Form.Group>
-          <Form.Group className="mb-3">
+          <Form.Group className="mb-3 form-group">
             <Form.Label>Assigned</Form.Label>
-            <Form.Control
+            <Form.Select
               type="text"
               label="assigned"
               name="assigned"
-              as="select"
               onChange={handleChange}
             >
               <option value=""></option>
               <option value="Momodu">Momodu</option>
               <option value="Claude">Claude</option>
-            </Form.Control>
+            </Form.Select>
           </Form.Group>
         </Col>
       </Row>
