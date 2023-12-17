@@ -4,8 +4,9 @@ import Row from "react-bootstrap/Row";
 import Tab from "react-bootstrap/Tab";
 import { useDropzone } from "react-dropzone";
 import "../../App.css";
+import "./ComplianceV2.css";
 import Button from "react-bootstrap/Button";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axiosInstance from "../../axios";
 import Loading from "../Loading";
 import Navbar from "react-bootstrap/Navbar";
@@ -13,6 +14,8 @@ import Dropdown from "react-bootstrap/Dropdown";
 
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Popover from "react-bootstrap/Popover";
+
+import TextAreaAutoSize from "react-textarea-autosize";
 
 import {
   faPenToSquare,
@@ -392,14 +395,17 @@ function ComplianceListV2() {
   };
 
   const handleChangeProposalTitle = (e) => {
-    let proposalDataCopy = proposalData;
+    let proposalDataCopy = { ...proposalData };
     proposalDataCopy.title = e.target.value;
     updateProposalData(proposalDataCopy);
   };
 
+  const textAreaRef = useRef(null);
+
   const handleEditMode = (e) => {
     if (e) {
       updateEditMode(e);
+      textAreaRef.current && textAreaRef.current.focus();
     } else {
       updateEditMode(e);
       axiosInstance
@@ -532,7 +538,7 @@ function ComplianceListV2() {
           id="list-group-tabs"
           defaultActiveKey="#link1"
         >
-          <Row className="h-100vh">
+          <Row>
             <Col
               className="d-flex justify-content-center bg-dark h-100%"
               lg={2}
@@ -540,20 +546,26 @@ function ComplianceListV2() {
             >
               <ListGroup className="w-100 align-content-center ms-3">
                 <ListGroup.Item>
-                  <Container style={{ width: "166px", height: "50px" }}>
+                  <Container style={{ width: "166px" }}>
                     <Container>
-                      {editMode ? (
-                        <input
-                          style={{ maxWidth: "100%", height: "50%" }}
-                          onChange={handleChangeProposalTitle}
-                          type="text"
-                          placeholder={proposalData.title}
-                        />
-                      ) : (
-                        <div style={{ height: "50%" }}>
-                          {proposalData.title}
-                        </div>
-                      )}
+                      <TextAreaAutoSize
+                        className="titleInputTextArea"
+                        ref={textAreaRef}
+                        style={{
+                          maxWidth: "100%",
+                          height: "50%",
+                          overflow: "hidden",
+                          resize: "none",
+                          border: editMode
+                            ? "2px solid #000000"
+                            : "2px solid transparent",
+                          boxSizing: "border-box",
+                          cursor: editMode ? "text" : "default",
+                        }}
+                        readOnly={!editMode}
+                        onChange={handleChangeProposalTitle}
+                        value={proposalData.title}
+                      />
                       <div
                         onClick={() => handleEditMode(!editMode)}
                         style={{ height: "50%" }}
