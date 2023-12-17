@@ -43,20 +43,20 @@
 .dropzone {
   text-align: center;
   padding: 20px;
-  border: 3px #38517B dashed;
+  border: 3px #38517b dashed;
   width: 60%;
   margin: auto;
   border-radius: 15px;
 }
 
 .custom-pover-body {
-  background-color: #AEBC37;
+  background-color: #aebc37;
   width: fit-content;
   border-radius: 15px;
 }
 
 .custom-pover {
-  background-color: #AEBC37;
+  background-color: #aebc37;
 }
 
 .customBtn {
@@ -68,6 +68,3 @@
   box-shadow: 1px 1px 1px grey;
   white-space: nowrap;
 }
-
-
-

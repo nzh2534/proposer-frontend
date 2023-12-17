@@ -1,0 +1,5 @@
+# To tell Git to ignore these commits when performing `git blame`, run:
+#    `git config blame.ignoreRevsFile .git-blame-ignore-revs`
+
+# Ignore mass formatting commit
+dc996b792a09576ae03c8164456a616ef7a9f2a2
