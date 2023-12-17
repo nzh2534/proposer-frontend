@@ -366,7 +366,6 @@ function Outline({ textArray, proposalData }) {
     console.log(previousContent);
     updateOutlineContent(previousContent);
   };
-
   return (
     <Row>
       <Col
