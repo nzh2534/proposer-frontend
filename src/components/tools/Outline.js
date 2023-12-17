@@ -21,11 +21,11 @@ function Outline({ textArray, proposalData }) {
   const [outlineContent, updateOutlineContent] = useState(false);
   const [documentId, updateDocumentId] = useState(proposalData.proposal_id);
   const [documentLink, updateDocumentLink] = useState(
-    proposalData.proposal_link
+    proposalData.proposal_link,
   );
   const [headerId, updateHeaderId] = useState("");
   const [documentIndex, updateDocumentIndex] = useState(
-    testHeader.length + instructionText.length + 1
+    testHeader.length + instructionText.length + 1,
   );
   const [requests, updateRequests] = useState([
     // {
@@ -86,7 +86,7 @@ function Outline({ textArray, proposalData }) {
           updateGoogleLoggedIn(true);
           updateAuthCred(tokenResponse.access_token);
         },
-      })
+      }),
     );
 
     gapi.load("client:auth2", start);
@@ -145,7 +145,7 @@ function Outline({ textArray, proposalData }) {
         body: JSON.stringify({
           requests: requests,
         }),
-      }
+      },
     )
       .then((res) => {
         return res.json();
@@ -233,7 +233,7 @@ function Outline({ textArray, proposalData }) {
                 // },
               ],
             }),
-          }
+          },
         );
       });
   };
@@ -429,7 +429,7 @@ function Outline({ textArray, proposalData }) {
                                 onDrop={(e) => handleDropContent(e)}
                                 name={`${item}_content`}
                                 placeholder={Object.keys(
-                                  outlineContent[item]
+                                  outlineContent[item],
                                 ).toString()}
                               />
                             </Form.Group>
