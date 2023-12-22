@@ -4,9 +4,9 @@ import Row from "react-bootstrap/Row";
 import Tab from "react-bootstrap/Tab";
 import { useDropzone } from "react-dropzone";
 import "../../App.css";
+import "./ComplianceV2.css";
 import Button from "react-bootstrap/Button";
 import React, { useEffect, useState, useRef } from "react";
-
 import axiosInstance from "../../axios";
 import Loading from "../Loading";
 import Navbar from "react-bootstrap/Navbar";
@@ -399,14 +399,17 @@ function ComplianceListV2() {
   };
 
   const handleChangeProposalTitle = (e) => {
-    let proposalDataCopy = proposalData;
+    let proposalDataCopy = { ...proposalData };
     proposalDataCopy.title = e.target.value;
     updateProposalData(proposalDataCopy);
   };
 
+  const textAreaRef = useRef(null);
+
   const handleEditMode = (e) => {
     if (e) {
       updateEditMode(e);
+      textAreaRef.current && textAreaRef.current.focus();
     } else {
       updateEditMode(e);
       axiosInstance
@@ -539,7 +542,7 @@ function ComplianceListV2() {
           id="list-group-tabs"
           defaultActiveKey="#link1"
         >
-          <Row className="h-100vh">
+          <Row>
             <Col
               className="d-flex justify-content-start bg-dark h-100% flex-column align-content-center"
               lg={2}
@@ -547,27 +550,36 @@ function ComplianceListV2() {
             >
               <ListGroup>
                 <ListGroup.Item>
-                  <Container>
-                    {editMode ? (
-                      <Container>
-                        <input
-                          style={{ maxWidth: "10vw" }}
-                          onChange={handleChangeProposalTitle}
-                          type="text"
-                          placeholder={proposalData.title}
+                  <Container style={{ width: "166px" }}>
+                    <Container>
+                      <TextAreaAutoSize
+                        className="titleInputTextArea"
+                        ref={textAreaRef}
+                        style={{
+                          maxWidth: "100%",
+                          height: "50%",
+                          overflow: "hidden",
+                          resize: "none",
+                          border: editMode
+                            ? "2px solid #000000"
+                            : "2px solid transparent",
+                          boxSizing: "border-box",
+                          cursor: editMode ? "text" : "default",
+                        }}
+                        readOnly={!editMode}
+                        onChange={handleChangeProposalTitle}
+                        value={proposalData.title}
+                      />
+                      <div
+                        onClick={() => handleEditMode(!editMode)}
+                        style={{ height: "50%" }}
+                      >
+                        <FontAwesomeIcon
+                          icon={editMode ? faFloppyDisk : faPenToSquare}
+                          size="xs"
                         />
-                        <div onClick={() => handleEditMode(false)}>
-                          <FontAwesomeIcon icon={faFloppyDisk} size="xs" />
-                        </div>
-                      </Container>
-                    ) : (
-                      <Container>
-                        {proposalData.title}
-                        <div onClick={() => handleEditMode(true)}>
-                          <FontAwesomeIcon icon={faPenToSquare} size="xs" />
-                        </div>
-                      </Container>
-                    )}
+                      </div>
+                    </Container>
                   </Container>
                 </ListGroup.Item>
                 <ListGroup.Item action href="#link1">
