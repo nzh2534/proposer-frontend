@@ -540,7 +540,7 @@ function ComplianceListV2() {
             >
               <ListGroup className="w-100 align-content-center ms-3">
                 <ListGroup.Item>
-                  <Container style={{ width: "166px", height: "50px" }}>
+                  <Container style={{ width: "166px", height: "auto" }}>
                     <Container>
                       {editMode ? (
                         <input
