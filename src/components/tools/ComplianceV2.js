@@ -17,6 +17,8 @@ import Popover from "react-bootstrap/Popover";
 
 import TextAreaAutoSize from "react-textarea-autosize";
 
+import DeleteProposalModal from "./DeleteProposalModal";
+
 import {
   faPenToSquare,
   faTrashCan,
@@ -44,6 +46,7 @@ import Outline from "./Outline";
 import Table from "react-bootstrap/Table";
 import InputGroup from "react-bootstrap/InputGroup";
 import CsvDownloadButton from "react-json-to-csv";
+import axios from "axios";
 
 function ComplianceListV2() {
   const { pk } = useParams();
@@ -64,6 +67,7 @@ function ComplianceListV2() {
   const [checklistData, updateChecklistData] = useState([]);
   const [searchInput, updateSearchInput] = useState("");
   const [complianceDataOriginal, updateComplianceDataOriginal] = useState();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const { getRootProps, getInputProps, acceptedFiles } = useDropzone({
     maxFiles: 1,
@@ -540,11 +544,11 @@ function ComplianceListV2() {
         >
           <Row>
             <Col
-              className="d-flex justify-content-center bg-dark h-100%"
+              className="d-flex justify-content-start bg-dark h-100% flex-column align-content-center"
               lg={2}
               style={{ minHeight: "100vh", height: "auto" }}
             >
-              <ListGroup className="w-100 align-content-center ms-3">
+              <ListGroup>
                 <ListGroup.Item>
                   <Container style={{ width: "166px" }}>
                     <Container>
@@ -593,6 +597,22 @@ function ComplianceListV2() {
                 ) : (
                   <></>
                 )}
+              </ListGroup>
+              <hr />
+              <ListGroup>
+                <ListGroup.Item>
+                  <Button
+                    style={{ backgroundColor: "#f44336", color: "white" }}
+                    onClick={() => setShowDeleteModal(true)}
+                  >
+                    Delete
+                  </Button>
+                  <DeleteProposalModal
+                    show={showDeleteModal}
+                    setShow={setShowDeleteModal}
+                    proposalData={proposalData}
+                  />
+                </ListGroup.Item>
               </ListGroup>
             </Col>
             <Col lg={10}>
