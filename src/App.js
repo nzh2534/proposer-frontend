@@ -11,7 +11,7 @@ import Create from "./components/Create";
 import "./App.css";
 import Logout from "./components/Logout";
 import Delete from "./components/Delete";
-import { ComplianceListV2 } from "./components/tools";
+import { ComplianceListV2, Splitter } from "./components/tools/index";
 
 function App() {
   const navigate = useNavigate();
@@ -46,6 +46,7 @@ function App() {
       <div className="App">
         <Routes>
           <Route path="/dashboard" element={<Home />} />
+          <Route path="/splitter" element={<Splitter />} />
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
           <Route path="/logout" element={<Logout />} />
