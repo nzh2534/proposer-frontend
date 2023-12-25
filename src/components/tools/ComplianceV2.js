@@ -46,7 +46,7 @@ import Outline from "./Outline";
 import Table from "react-bootstrap/Table";
 import InputGroup from "react-bootstrap/InputGroup";
 import CsvDownloadButton from "react-json-to-csv";
-import axios from "axios";
+import Splitter from "./Splitter";
 
 function ComplianceListV2() {
   const { pk } = useParams();
@@ -1240,16 +1240,17 @@ function ComplianceListV2() {
                                             <Tab.Pane
                                               key={index}
                                               eventKey={`#link${index}`}
-                                              onClick={() =>
-                                                handleImageMode(false)
-                                              }
+                                              // onClick={() =>
+                                              //   handleImageMode(false)
+                                              // }
                                             >
-                                              <img
+                                              {/* <img
                                                 src={item.content}
                                                 alt={index}
                                                 width="500"
                                                 height="auto"
-                                              />
+                                              /> */}
+                                              <Splitter src={item.content} alt={index}/>
                                             </Tab.Pane>
                                           ) : (
                                             <Tab.Pane

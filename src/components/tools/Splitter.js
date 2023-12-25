@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 
-const Splitter = () => {
+const Splitter = ({src, alt}) => {
   const [boxes, setBoxes] = useState([]);
   const [drawing, setDrawing] = useState(false);
   const [startCoords, setStartCoords] = useState({ x: 0, y: 0 });
@@ -42,7 +42,9 @@ const Splitter = () => {
   };
 
   return (
-    <div style={{backgroundColor: "gray"}}>
+    <div>
+      <button onClick={()=>setBoxes([])}>Reset</button>
+      <button onClick={handleLogCoordinates}>Log Coordinates</button>
       <div
         style={{ position: 'relative', display: 'inline-block' }}
         onMouseDown={handleMouseDown}
@@ -50,8 +52,8 @@ const Splitter = () => {
       >
         <img
           ref={imageRef}
-          src="https://django-proposer.s3.amazonaws.com/media/61_90_content.jpg"
-          alt="Your Image"
+          src={src}
+          alt={alt}
           style={{ maxWidth: '100%', maxHeight: '100%' }}
         />
 
@@ -83,8 +85,6 @@ const Splitter = () => {
           />
         ))}
       </div>
-
-      <button onClick={handleLogCoordinates}>Log Coordinates</button>
     </div>
   );
 };
