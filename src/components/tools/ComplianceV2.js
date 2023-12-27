@@ -537,12 +537,9 @@ function ComplianceListV2() {
   return (
     <>
       {proposalData ? (
-        <Tab.Container
-          className="h-100vh"
-          id="list-group-tabs"
-          defaultActiveKey="#link1"
-        >
-          <Row>
+        <Tab.Container id="list-group-tabs" defaultActiveKey="#link1">
+          <Container fluid className="h-100 w-100">
+            <Row className="h-100">
             <Col
               className="d-flex justify-content-start bg-dark h-100% flex-column align-content-center"
               lg={2}
@@ -615,9 +612,15 @@ function ComplianceListV2() {
                 </ListGroup.Item>
               </ListGroup>
             </Col>
-            <Col lg={10}>
-              <Tab.Content className="h-100vh">
-                <Tab.Pane eventKey="#link1">
+              <Col
+                lg={10}
+                style={{ overflow: "hidden", height: "100%", display: "flex" }}
+              >
+                <Tab.Content>
+                  <Tab.Pane
+                    eventKey="#link1"
+                    className="h-100 d-flex flex-column"
+                  >
                   {proposalData ? (
                     proposalData.nofo ? (
                       focusData.focusing ? (
@@ -989,11 +992,11 @@ function ComplianceListV2() {
                             id="list-group-tabs"
                             defaultActiveKey="#link1"
                           >
-                            <Row>
+                              <Row className="flex-grow-1 overflow-hidden">
                               {panelRight ? (
                                 <Col
                                   sm={8}
-                                  className="vh-100 d-flex justify-content-center overflow-scroll"
+                                    className="d-flex justify-content-center overflow-scroll"
                                   style={{ maxHeight: "90vh" }}
                                 >
                                   <Form style={{ width: "100%" }}>
@@ -1116,8 +1119,8 @@ function ComplianceListV2() {
                                 <></>
                               )}
                               <Col
-                                sm={4}
-                                className="vh-100 overflow-auto"
+                                  sm={5}
+                                  className="overflow-scroll h-100"
                                 style={{ maxHeight: "90vh" }}
                               >
                                 <ListGroup>
@@ -1179,7 +1182,7 @@ function ComplianceListV2() {
                                               name={item.id}
                                               alt={index}
                                               style={{
-                                                maxWidth: "50vh",
+                                                  maxWidth: "100%",
                                                 height: "auto",
                                                 borderRadius: "5px",
                                               }}
@@ -1212,7 +1215,7 @@ function ComplianceListV2() {
                                               name={item.id}
                                               alt={index}
                                               style={{
-                                                maxWidth: "50vh",
+                                                  maxWidth: "100%",
                                                 height: "auto",
                                                 borderRadius: "5px",
                                               }}
@@ -1334,6 +1337,7 @@ function ComplianceListV2() {
               </Tab.Content>
             </Col>
           </Row>
+          </Container>
         </Tab.Container>
       ) : (
         <Loading />
