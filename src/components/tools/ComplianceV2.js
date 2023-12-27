@@ -1286,7 +1286,7 @@ function ComplianceListV2() {
                     runningTrigger ? (
                       <Container>
                         Leave this page run in the background (~15 minutes for a
-                        50 page document and ~30 minutes for a 100 page
+                          docuemnt. This should take ~15 minutes for a 50 page
                         document)
                         <Loading />
                       </Container>
