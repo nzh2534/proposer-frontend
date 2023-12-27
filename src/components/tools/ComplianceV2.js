@@ -1230,39 +1230,46 @@ function ComplianceListV2() {
                               {panelRight ? (
                                 <></>
                               ) : (
-                                <Col
-                                  sm={8}
-                                  className="vh-100 overflow-auto"
-                                  style={{ maxHeight: "90vh" }}
-                                >
-                                  <Tab.Content>
+                                  <Col sm={7} className="overflow-auto h-100">
+                                    <div
+                                      className="sticky-top w-100"
+                                      style={{ backgroundColor: "white" }}
+                                    >
+                                      <Button
+                                        onClick={() =>
+                                          handleImageMode(!imageMode)
+                                        }
+                                      >
+                                        View
+                                        {imageMode
+                                          ? " Scanned Text"
+                                          : " Source Image"}
+                                      </Button>
+                                    </div>
+                                    <Tab.Content className="d-flex flex-column">
                                     {complianceData?.map((item, index) => {
                                       return (
                                         <>
                                           {imageMode ? (
                                             <Tab.Pane
-                                              key={index}
+                                                key={item.id}
                                               eventKey={`#link${index}`}
-                                              onClick={() =>
-                                                handleImageMode(false)
-                                              }
                                             >
                                               <img
                                                 src={item.content}
                                                 alt={index}
-                                                width="500"
+                                                  width="100%"
                                                 height="auto"
                                               />
                                             </Tab.Pane>
                                           ) : (
                                             <Tab.Pane
-                                              key={index}
+                                                key={item.id}
                                               eventKey={`#link${index}`}
-                                              onClick={() =>
-                                                handleImageMode(true)
-                                              }
                                             >
+                                                <div className="text-start fs-8 my-3 mx-5">
                                               {item.content_text}
+                                                </div>
                                             </Tab.Pane>
                                           )}
                                         </>
