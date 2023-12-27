@@ -730,7 +730,7 @@ function ComplianceListV2() {
                                     return (
                                       <Dropdown.Item
                                         name={item}
-                                        key={index}
+                                          key={item.id}
                                         onClick={(e) => handleActiveFilter(e)}
                                       >
                                         {item}: {sectionData[item][0]}-
@@ -882,7 +882,7 @@ function ComplianceListV2() {
                                           <Button
                                             style={{ backgroundColor: "white" }}
                                             name={item}
-                                            key={index}
+                                              key={item.id}
                                             onClick={() =>
                                               updateActiveAiPrompt(
                                                 aiPrompts[item],
@@ -1045,7 +1045,7 @@ function ComplianceListV2() {
                                         {checklistData?.map((item, index) => {
                                           return (
                                             <tr
-                                              key={index}
+                                                key={item.id}
                                               name={item.id
                                                 .toString()
                                                 .concat("_item")}
@@ -1140,7 +1140,7 @@ function ComplianceListV2() {
                                         placement={
                                           panelRight ? "left" : "right"
                                         }
-                                        key={index}
+                                          key={item.id}
                                         delay={{ show: 250, hide: 400 }}
                                         overlay={
                                           <Popover className="custom-pover">
@@ -1160,7 +1160,7 @@ function ComplianceListV2() {
                                             className="d-flex justify-content-center bg-dark"
                                             action
                                             name={item.id}
-                                            key={index}
+                                              key={item.id}
                                             href={`#link${index}`}
                                             draggable="false"
                                             onDragStart={(e) => handleDrag(e)}
@@ -1193,7 +1193,7 @@ function ComplianceListV2() {
                                             className="d-flex justify-content-center"
                                             action
                                             name={item.id}
-                                            key={index}
+                                              key={item.id}
                                             href={`#link${index}`}
                                             draggable="true"
                                             onDragStart={(e) => handleDrag(e)}
