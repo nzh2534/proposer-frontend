@@ -62,6 +62,7 @@ const Splitter = ({item, alt, refresh}) => {
       console.log(res);
       refresh();
       setLoading(false);
+      setBoxes([]);
     })
   };
 
