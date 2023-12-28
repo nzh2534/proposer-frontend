@@ -1,13 +1,15 @@
 import React, { useState, useRef } from 'react';
 import axiosInstance from '../../axios';
 import Button from "react-bootstrap/Button";
+import Loading from '../Loading';
 
-const Splitter = ({item, alt}) => {
+const Splitter = ({item, alt, refresh}) => {
   const [boxes, setBoxes] = useState([]);
   const [drawing, setDrawing] = useState(false);
   const [boxId, setBoxId] = useState(1);
   const [startCoords, setStartCoords] = useState({ x: 0, y: 0 });
   const [endCoords, setEndCoords] = useState({ x: 0, y: 0 });
+  const [loading, setLoading] = useState(false);
   const imageRef = useRef(null);
 
   const getHierarchy = (title) => {
@@ -45,6 +47,7 @@ const Splitter = ({item, alt}) => {
 
   const handleLogCoordinates = (e) => {
     e.preventDefault();
+    setLoading(true);
     let formData = new FormData();
     formData.append("boxes", JSON.stringify(boxes));
     formData.append("baseId", getHierarchy(item.title).concat(".1"));
@@ -57,10 +60,12 @@ const Splitter = ({item, alt}) => {
     })
     .then((res) => {
       console.log(res);
+      refresh();
+      setLoading(false);
     })
   };
 
-  return (
+  return (<>{ loading ? <Loading /> :
     <div style={{backgroundColor: "gray"}}>
       <div>
         <Button onClick={()=>{setBoxes([]); setBoxId(0)}}>Reset Boxes</Button>
@@ -107,7 +112,7 @@ const Splitter = ({item, alt}) => {
         ))}
       </div>
     </div>
-  );
+          }</>);
 };
 
 export default Splitter;

@@ -102,7 +102,7 @@ function ComplianceListV2() {
     });
   }
 
-  useEffect(() => {
+  const refreshPage = () => {
     axiosInstance
       .get(`/proposals/${pk}`)
       .catch((error) => {
@@ -110,7 +110,6 @@ function ComplianceListV2() {
       })
       .then((res) => {
         var resDataCopy = { ...res.data };
-        //resDataCopy.complianceimages_set.sort((a, b) => a.id - b.id);
         updateProposalData(resDataCopy);
         updateComplianceData(sortByHierarchy(resDataCopy.complianceimages_set));
         updateComplianceDataOriginal(sortByHierarchy(resDataCopy.complianceimages_set));
@@ -119,7 +118,9 @@ function ComplianceListV2() {
         console.log(res);
         console.log(resDataCopy);
       });
-  }, [updateProposalData, pk]);
+  };
+
+  useEffect(refreshPage, [updateProposalData, pk]);
 
   const [addingSection, updateAddingSection] = useState({
     adding: false,
@@ -1278,7 +1279,7 @@ function ComplianceListV2() {
                                                 width="500"
                                                 height="auto"
                                               /> */}
-                                              <Splitter item={item} alt={index}/>
+                                              <Splitter item={item} alt={index} refresh={refreshPage}/>
                                             </Tab.Pane>
                                           ) : (
                                             <Tab.Pane
