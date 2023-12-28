@@ -74,6 +74,34 @@ function ComplianceListV2() {
   });
   const [tocPage, updateTocPage] = useState(false);
 
+  function sortByHierarchy(objects) {
+    return objects.sort((a, b) => {
+      const getHierarchy = (title) => {
+        const match = title.match(/_(\d+(\.\d+)*)_/);
+        return match ? match[1] : '';
+      };
+  
+      const hierarchyA = getHierarchy(a.title);
+      const hierarchyB = getHierarchy(b.title);
+  
+      const splitAndParse = (hierarchy) => hierarchy.split('.').map(parseFloat);
+  
+      const hierarchyArrayA = splitAndParse(hierarchyA);
+      const hierarchyArrayB = splitAndParse(hierarchyB);
+  
+      for (let i = 0; i < Math.max(hierarchyArrayA.length, hierarchyArrayB.length); i++) {
+        const numA = hierarchyArrayA[i] || 0;
+        const numB = hierarchyArrayB[i] || 0;
+  
+        if (numA !== numB) {
+          return numA - numB;
+        }
+      }
+  
+      return hierarchyArrayA.length - hierarchyArrayB.length;
+    });
+  }
+
   useEffect(() => {
     axiosInstance
       .get(`/proposals/${pk}`)
@@ -82,10 +110,10 @@ function ComplianceListV2() {
       })
       .then((res) => {
         var resDataCopy = { ...res.data };
-        resDataCopy.complianceimages_set.sort((a, b) => a.id - b.id);
+        //resDataCopy.complianceimages_set.sort((a, b) => a.id - b.id);
         updateProposalData(resDataCopy);
-        updateComplianceData(resDataCopy.complianceimages_set);
-        updateComplianceDataOriginal(resDataCopy.complianceimages_set);
+        updateComplianceData(sortByHierarchy(resDataCopy.complianceimages_set));
+        updateComplianceDataOriginal(sortByHierarchy(resDataCopy.complianceimages_set));
         updateSectionData(resDataCopy.compliance_sections);
         updateChecklistData(resDataCopy.checklist);
         console.log(res);
@@ -1250,7 +1278,7 @@ function ComplianceListV2() {
                                                 width="500"
                                                 height="auto"
                                               /> */}
-                                              <Splitter src={item.content} alt={index}/>
+                                              <Splitter item={item} alt={index}/>
                                             </Tab.Pane>
                                           ) : (
                                             <Tab.Pane

@@ -1,23 +1,34 @@
 import React, { useState, useRef } from 'react';
+import axiosInstance from '../../axios';
+import Button from "react-bootstrap/Button";
 
-const Splitter = ({src, alt}) => {
+const Splitter = ({item, alt}) => {
   const [boxes, setBoxes] = useState([]);
   const [drawing, setDrawing] = useState(false);
+  const [boxId, setBoxId] = useState(1);
   const [startCoords, setStartCoords] = useState({ x: 0, y: 0 });
   const [endCoords, setEndCoords] = useState({ x: 0, y: 0 });
   const imageRef = useRef(null);
 
+  const getHierarchy = (title) => {
+    const match = title.match(/_(\d+(\.\d+)*)_/);
+    return match ? match[1] : '';
+  };
+
   const handleMouseDown = (e) => {
     const { clientX, clientY } = e;
     const { left, top } = imageRef.current.getBoundingClientRect();
+    console.log(clientX - left, clientY - top)
+    console.log(imageRef.current.getBoundingClientRect())
 
     if (!drawing) {
       setStartCoords({ x: clientX - left, y: clientY - top });
       setDrawing(true);
+      setBoxId(boxId + 1);
     } else {
       setEndCoords({ x: clientX - left, y: clientY - top });
       setDrawing(false);
-      setBoxes([...boxes, { start: { ...startCoords }, end: { ...endCoords } }]);
+      setBoxes([...boxes, { start: { ...startCoords }, end: { ...endCoords }, id: getHierarchy(item.title).concat(".", boxId.toString())}]);
     }
   };
 
@@ -32,19 +43,29 @@ const Splitter = ({src, alt}) => {
     }
   };
 
-  const handleLogCoordinates = () => {
-    console.log('Bounding Box Coordinates:', boxes.map(box => ({
-      startY: box.start.y,
-      startX: box.start.x,
-      endY: box.end.y,
-      endX: box.end.x,
-    })));
+  const handleLogCoordinates = (e) => {
+    e.preventDefault();
+    let formData = new FormData();
+    formData.append("boxes", JSON.stringify(boxes));
+    formData.append("baseId", getHierarchy(item.title).concat(".1"));
+    formData.append("id", item.id);
+    formData.append("proposal", item.proposal);
+    axiosInstance
+    .post(`proposals/${item.proposal}/compliance/`, formData, {headers: { 'Content-Type': 'multipart/form-data'}})
+    .catch((error) => {
+      console.log(error.response);
+    })
+    .then((res) => {
+      console.log(res);
+    })
   };
 
   return (
-    <div>
-      <button onClick={()=>setBoxes([])}>Reset</button>
-      <button onClick={handleLogCoordinates}>Log Coordinates</button>
+    <div style={{backgroundColor: "gray"}}>
+      <div>
+        <Button onClick={()=>{setBoxes([]); setBoxId(0)}}>Reset Boxes</Button>
+        <Button style={{marginLeft: "5vw"}} onClick={handleLogCoordinates}>Split</Button>
+      </div>
       <div
         style={{ position: 'relative', display: 'inline-block' }}
         onMouseDown={handleMouseDown}
@@ -52,9 +73,9 @@ const Splitter = ({src, alt}) => {
       >
         <img
           ref={imageRef}
-          src={src}
+          src={item.content}
           alt={alt}
-          style={{ maxWidth: '100%', maxHeight: '100%' }}
+          style={{ width: '100%', height: 'auto', cursor: "crosshair"}}
         />
 
         {drawing && (
