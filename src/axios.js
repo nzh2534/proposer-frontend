@@ -9,8 +9,7 @@ const axiosInstance = axios.create({
     Authorization: localStorage.getItem("access_token")
       ? "JWT " + localStorage.getItem("access_token")
       : null,
-    "Content-Type": "application/json",
-    accept: "application/json",
+    "Content-Type": "application/json"
   },
 });
 

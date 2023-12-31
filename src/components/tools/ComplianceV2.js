@@ -46,7 +46,7 @@ import Outline from "./Outline";
 import Table from "react-bootstrap/Table";
 import InputGroup from "react-bootstrap/InputGroup";
 import CsvDownloadButton from "react-json-to-csv";
-import axios from "axios";
+import Splitter from "./Splitter";
 
 function ComplianceListV2() {
   const { pk } = useParams();
@@ -74,7 +74,35 @@ function ComplianceListV2() {
   });
   const [tocPage, updateTocPage] = useState(false);
 
-  useEffect(() => {
+  function sortByHierarchy(objects) {
+    return objects.sort((a, b) => {
+      const getHierarchy = (title) => {
+        const match = title.match(/_(\d+(\.\d+)*)_/);
+        return match ? match[1] : '';
+      };
+  
+      const hierarchyA = getHierarchy(a.title);
+      const hierarchyB = getHierarchy(b.title);
+  
+      const splitAndParse = (hierarchy) => hierarchy.split('.').map(parseFloat);
+  
+      const hierarchyArrayA = splitAndParse(hierarchyA);
+      const hierarchyArrayB = splitAndParse(hierarchyB);
+  
+      for (let i = 0; i < Math.max(hierarchyArrayA.length, hierarchyArrayB.length); i++) {
+        const numA = hierarchyArrayA[i] || 0;
+        const numB = hierarchyArrayB[i] || 0;
+  
+        if (numA !== numB) {
+          return numA - numB;
+        }
+      }
+  
+      return hierarchyArrayA.length - hierarchyArrayB.length;
+    });
+  }
+
+  const refreshPage = () => {
     axiosInstance
       .get(`/proposals/${pk}`)
       .catch((error) => {
@@ -82,16 +110,17 @@ function ComplianceListV2() {
       })
       .then((res) => {
         var resDataCopy = { ...res.data };
-        resDataCopy.complianceimages_set.sort((a, b) => a.id - b.id);
         updateProposalData(resDataCopy);
-        updateComplianceData(resDataCopy.complianceimages_set);
-        updateComplianceDataOriginal(resDataCopy.complianceimages_set);
+        updateComplianceData(sortByHierarchy(resDataCopy.complianceimages_set));
+        updateComplianceDataOriginal(sortByHierarchy(resDataCopy.complianceimages_set));
         updateSectionData(resDataCopy.compliance_sections);
         updateChecklistData(resDataCopy.checklist);
         console.log(res);
         console.log(resDataCopy);
       });
-  }, [updateProposalData, pk]);
+  };
+
+  useEffect(refreshPage, [updateProposalData, pk]);
 
   const [addingSection, updateAddingSection] = useState({
     adding: false,
@@ -1240,16 +1269,17 @@ function ComplianceListV2() {
                                             <Tab.Pane
                                               key={index}
                                               eventKey={`#link${index}`}
-                                              onClick={() =>
-                                                handleImageMode(false)
-                                              }
+                                              // onClick={() =>
+                                              //   handleImageMode(false)
+                                              // }
                                             >
-                                              <img
+                                              {/* <img
                                                 src={item.content}
                                                 alt={index}
                                                 width="500"
                                                 height="auto"
-                                              />
+                                              /> */}
+                                              <Splitter item={item} alt={index} refresh={refreshPage}/>
                                             </Tab.Pane>
                                           ) : (
                                             <Tab.Pane

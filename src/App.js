@@ -11,7 +11,7 @@ import Create from "./components/Create";
 import "./App.css";
 import Logout from "./components/Logout";
 import Delete from "./components/Delete";
-import { ComplianceListV2 } from "./components/tools";
+import { ComplianceListV2} from "./components/tools/index";
 
 function App() {
   const navigate = useNavigate();
