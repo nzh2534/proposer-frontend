@@ -174,63 +174,6 @@ function Outline({ textArray, proposalData }) {
                     },
                   },
                 },
-                // {
-                //     insertInlineImage: {
-                //         uri: "https://drive.google.com/uc?export=view&id=1p72vX9rbU0zuNRkuXNnUNpCXUkcWfvBX",
-                //         objectSize: {
-                //             height: {
-                //                 magnitude: 60,
-                //                 unit: "PT"
-                //             },
-                //             width: {
-                //                 magnitude: 120,
-                //                 unit: "PT"
-                //             },
-                //         },
-                //         endOfSegmentLocation: {
-                //         segmentId: val.replies[0].createHeader.headerId
-                //         },
-                //     },
-                // },
-                // {
-                //     updateTextStyle: {
-                //       textStyle: {
-                //         italic: true,
-                //         fontSize: {magnitude: 11, unit: 'PT'},
-                //         weightedFontFamily: {fontFamily: 'Times New Roman', weight: 400}
-                //       },
-                //       fields: "*",
-                //       range: {
-                //         segmentId: val.replies[0].createHeader.headerId,
-                //         startIndex: 0,
-                //         endIndex: proposalData.title.length + 1,
-                //       },
-                //     },
-                // },
-                // {
-                //     insertText: {
-                //         text: "Use or disclosure of data contained on this sheet is subject to the restriction on the title page of this application.",
-                //         location: {
-                //         segmentId: val.replies[1].createFooter.footerId,
-                //         index: 0,
-                //         },
-                //     },
-                // },
-                // {
-                //     updateTextStyle: {
-                //       textStyle: {
-                //         italic: true,
-                //         fontSize: {magnitude: 9, unit: 'PT'},
-                //         weightedFontFamily: {fontFamily: 'Times New Roman', weight: 400}
-                //       },
-                //       fields: "*",
-                //       range: {
-                //         segmentId: val.replies[1].createFooter.footerId,
-                //         startIndex: 0,
-                //         endIndex: "Use or disclosure of data contained on this sheet is subject to the restriction on the title page of this application.".length + 1,
-                //       },
-                //     },
-                // },
               ],
             }),
           },

@@ -23,16 +23,12 @@ import {
   faPenToSquare,
   faTrashCan,
   faUndo,
-  faCalendar,
   faFileWord,
   faPlus,
   faX,
   faFloppyDisk,
   faClockRotateLeft,
   faFlag,
-  faArrowRight,
-  faArrowLeft,
-  faFileCsv,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -43,15 +39,13 @@ import { Configuration, OpenAIApi } from "openai";
 import { useParams } from "react-router-dom";
 import Form from "react-bootstrap/Form";
 import Outline from "./Outline";
-import Table from "react-bootstrap/Table";
 import InputGroup from "react-bootstrap/InputGroup";
-import CsvDownloadButton from "react-json-to-csv";
 import Splitter from "./Splitter";
+import Checklist from "./Checklist";
 
 function ComplianceListV2() {
   const { pk } = useParams();
   const [editMode, updateEditMode] = useState(false);
-  const [panelRight, updatePanelRight] = useState(false);
   const [proposalData, updateProposalData] = useState(false);
   const [complianceData, updateComplianceData] = useState();
   const [imageMode, updateImageMode] = useState(false);
@@ -206,11 +200,6 @@ function ComplianceListV2() {
     e.dataTransfer.setData("name", e.target.name);
   };
 
-  const handleDragSection = (e, id) => {
-    console.log(id);
-    e.dataTransfer.setData("sec_id", id);
-  };
-
   const handleAllowDrop = (e) => {
     e.preventDefault();
   };
@@ -240,76 +229,6 @@ function ComplianceListV2() {
     }
   };
 
-  const handleDropSection = async (e) => {
-    if (e.dataTransfer.getData("name")) {
-      var id = e.dataTransfer.getData("name");
-      const cklistcopy = [...checklistData];
-      console.log(e.target.name);
-      var specificComplianceItem = complianceData.find((item) => {
-        return item.id === parseInt(id);
-      });
-      const objIndex = cklistcopy.findIndex(
-        (obj) => obj.id === parseInt(e.target.name),
-      );
-      cklistcopy[objIndex].data = cklistcopy[objIndex].data.concat(
-        specificComplianceItem.content_text,
-        "\n",
-      );
-      cklistcopy[objIndex].pages = cklistcopy[objIndex].pages.concat(
-        specificComplianceItem.page_number,
-        ", ",
-      );
-      console.log(cklistcopy);
-      updateChecklistData(cklistcopy);
-    } else {
-      console.log("second");
-      var current = parseInt(e.dataTransfer.getData("sec_id"));
-      var target = parseInt(e.target.name.split("_")[0]);
-      console.log(current); //current
-      console.log(target); //target
-      const cklistcopy = [...checklistData];
-      const newcklist = [];
-      if (current > target) {
-        cklistcopy.map((item) => {
-          if (item.id < target) {
-            newcklist.push(item);
-          } else if (item.id === current) {
-            var itemCopy = { ...item };
-            itemCopy.id = target;
-            newcklist.push(itemCopy);
-          } else if (item.id >= target && item.id < current) {
-            var itemCopy = { ...item };
-            itemCopy.id += 1;
-            newcklist.push(itemCopy);
-          } else {
-            newcklist.push(item);
-          }
-        });
-        newcklist.sort((a, b) => a.id - b.id);
-        console.log(newcklist);
-      } else {
-        cklistcopy.map((item) => {
-          if (item.id < current) {
-            newcklist.push(item);
-          } else if (item.id === current) {
-            var itemCopy = { ...item };
-            itemCopy.id = target - 1;
-            newcklist.push(itemCopy);
-          } else if (item.id > current && item.id < target) {
-            var itemCopy = { ...item };
-            itemCopy.id -= 1;
-            newcklist.push(itemCopy);
-          } else {
-            newcklist.push(item);
-          }
-        });
-        newcklist.sort((a, b) => a.id - b.id);
-        console.log(newcklist);
-      }
-      updateChecklistData(newcklist);
-    }
-  };
-
   const handleDropDelete = (e) => {
     if (e.dataTransfer.getData("name")) {
       const id = e.dataTransfer.getData("name");
@@ -334,25 +253,6 @@ function ComplianceListV2() {
       updateChecklistData(filteredChecklistArray);
     }
   };
-
-  // const handleSubmit = (e) => {
-  //     e.preventDefault();
-  //     const newProposalData = Object.assign({}, proposalData);
-  //     newProposalData.complianceimages_set = [...complianceData];
-  //     updateProposalData(newProposalData)
-
-  //     axiosInstance
-  //         .put(`proposals/${proposal.pk}/update/`, {
-  //             title: proposalData.title,
-  //             complianceimages_set: [...complianceData]
-  //         })
-  //         .catch((error) => {
-  //             console.log(error.response)
-  //         })
-  //         .then((res) => {
-  //             console.log(res)
-  //         });
-  // };
 
   //new section functionality
   const handleChangeNewSection = (e) => {
@@ -509,44 +409,6 @@ function ComplianceListV2() {
       });
   };
 
-  const handleAddToChecklist = () => {
-    var checklistCopy = [...checklistData];
-    var maxId = Math.max(...checklistCopy.map((o) => o.id));
-    checklistCopy.push({ item: "", id: maxId + 1, data: "", pages: "" });
-    updateChecklistData(checklistCopy);
-  };
-
-  const handleChecklistChange = (e) => {
-    var checklistCopy = [...checklistData];
-    const items = e.target.name.split("_");
-    const index = checklistCopy.findIndex(
-      (obj) => obj.id === parseInt(items[0]),
-    );
-    checklistCopy[index][items[1]] = e.target.value;
-    console.log(checklistCopy);
-    updateChecklistData(checklistCopy);
-  };
-
-  const handleSaveChecklist = () => {
-    var checklistCopy = [...checklistData];
-    axiosInstance
-      .put(`proposals/${pk}/update/`, {
-        title: proposalData.title,
-        checklist: checklistCopy,
-      })
-      .catch((error) => {
-        console.log(error.response);
-      })
-      .then((res) => {
-        console.log(res);
-        alert(`Compliance Checklist Saved for ${proposalData.title}!`);
-      });
-  };
-
-  // const handleCsvExport = () => {
-
-  // }
-
   const handleNofoSearch = (e) => {
     if (e.target.value.toLowerCase().length === 0) {
       updateSearchInput("");
@@ -612,13 +474,13 @@ function ComplianceListV2() {
                   </Container>
                 </ListGroup.Item>
                 <ListGroup.Item action href="#link1">
-                  Compliance
+                  Viewer
                 </ListGroup.Item>
                 {proposalData.nofo ? (
                   <>
-                    {/* <ListGroup.Item action href="#link2">
-                Calendar
-                </ListGroup.Item> */}
+                    <ListGroup.Item action href="#link2">
+                      Compliance
+                    </ListGroup.Item>
                     <ListGroup.Item action href="#link3">
                       Outline
                     </ListGroup.Item>
@@ -730,19 +592,6 @@ function ComplianceListV2() {
                             bg="white"
                             className="d-flex justify-content-center mb-2"
                           >
-                            {panelRight ? (
-                              <Col
-                                onClick={() => updatePanelRight(false)}
-                                style={{ maxWidth: "5vw", cursor: "pointer" }}
-                              >
-                                <FontAwesomeIcon
-                                  size="2xl"
-                                  icon={faArrowLeft}
-                                />
-                              </Col>
-                            ) : (
-                              <></>
-                            )}
                             <Dropdown>
                               <Dropdown.Toggle
                                 style={{ backgroundColor: "white" }}
@@ -862,9 +711,6 @@ function ComplianceListV2() {
                                 )}
                               </Dropdown.Menu>
                             </Dropdown>
-                            {/* <Col style={{ padding: "3px", backgroundColor: "#AEBC37", borderRadius: "5px", marginLeft:'1vw', marginRight:'1vw'}} onDragOver={(e) => handleAllowDrop(e)} onDrop={(e) => handleDropCalendar(e)}>
-        <FontAwesomeIcon size="2xl" icon={faCalendar} />
-    </Col> */}
                             <Col
                               style={{
                                 padding: "3px",
@@ -1000,150 +846,12 @@ function ComplianceListV2() {
                             >
                               <FontAwesomeIcon size="2xl" icon={faTrashCan} />
                             </Col>
-                            {panelRight ? (
-                              <></>
-                            ) : (
-                              <Col
-                                onClick={() => updatePanelRight(true)}
-                                style={{ maxWidth: "5vw", cursor: "pointer" }}
-                              >
-                                <FontAwesomeIcon
-                                  size="2xl"
-                                  icon={faArrowRight}
-                                />
-                              </Col>
-                            )}
                           </Navbar>
                           <Tab.Container
                             id="list-group-tabs"
                             defaultActiveKey="#link1"
                           >
                             <Row>
-                              {panelRight ? (
-                                <Col
-                                  sm={8}
-                                  className="vh-100 d-flex justify-content-center overflow-scroll"
-                                  style={{ maxHeight: "90vh" }}
-                                >
-                                  <Form style={{ width: "100%" }}>
-                                    <Button
-                                      style={{ marginBottom: "1vh" }}
-                                      onClick={() => handleAddToChecklist()}
-                                    >
-                                      <FontAwesomeIcon
-                                        size="sm"
-                                        icon={faPlus}
-                                      />
-                                    </Button>
-                                    <Button
-                                      style={{
-                                        marginBottom: "1vh",
-                                        marginLeft: "1vh",
-                                        marginRight: "1vh",
-                                      }}
-                                      onClick={() => handleSaveChecklist()}
-                                    >
-                                      <FontAwesomeIcon
-                                        size="sm"
-                                        icon={faFloppyDisk}
-                                      />
-                                    </Button>
-                                    <CsvDownloadButton
-                                      style={{ marginBottom: "1vh" }}
-                                      className="btn btn-primary"
-                                      data={checklistData}
-                                      delimiter=","
-                                    >
-                                      <FontAwesomeIcon
-                                        size="sm"
-                                        icon={faFileCsv}
-                                      />
-                                    </CsvDownloadButton>
-                                    <Table striped bordered hover>
-                                      <thead>
-                                        <tr>
-                                          <th>Pg.</th>
-                                          <th>Item</th>
-                                          <th>Details</th>
-                                        </tr>
-                                      </thead>
-                                      <tbody>
-                                        {checklistData?.map((item, index) => {
-                                          return (
-                                            <tr
-                                              key={index}
-                                              name={item.id
-                                                .toString()
-                                                .concat("_item")}
-                                            >
-                                              <td style={{ maxWidth: "10vh" }}>
-                                                <Form.Control
-                                                  name={item.id
-                                                    .toString()
-                                                    .concat("_pages")}
-                                                  as="textarea"
-                                                  value={item.pages}
-                                                  onChange={(e) =>
-                                                    handleChecklistChange(e)
-                                                  }
-                                                />
-                                              </td>
-                                              <td
-                                                style={{
-                                                  maxWidth: "20vh",
-                                                  cursor: "grab",
-                                                }}
-                                                draggable
-                                                onDragStart={(e) =>
-                                                  handleDragSection(e, item.id)
-                                                }
-                                                onDragOver={(e) =>
-                                                  handleAllowDrop(e)
-                                                }
-                                                onDrop={(e) =>
-                                                  handleDropSection(e)
-                                                }
-                                              >
-                                                <Form.Control
-                                                  name={item.id
-                                                    .toString()
-                                                    .concat("_item")}
-                                                  as="textarea"
-                                                  value={item.item}
-                                                  onChange={(e) =>
-                                                    handleChecklistChange(e)
-                                                  }
-                                                />
-                                              </td>
-                                              <td>
-                                                <Form.Control
-                                                  name={item.id
-                                                    .toString()
-                                                    .concat("_data")}
-                                                  as="textarea"
-                                                  value={item.data}
-                                                  style={{ minWidth: "50vh" }}
-                                                  onDragOver={(e) =>
-                                                    handleAllowDrop(e)
-                                                  }
-                                                  onDrop={(e) =>
-                                                    handleDropSection(e)
-                                                  }
-                                                  onChange={(e) =>
-                                                    handleChecklistChange(e)
-                                                  }
-                                                />
-                                              </td>
-                                            </tr>
-                                          );
-                                        })}
-                                      </tbody>
-                                    </Table>
-                                  </Form>
-                                </Col>
-                              ) : (
-                                <></>
-                              )}
                               <Col
                                 sm={4}
                                 className="vh-100 overflow-auto"
@@ -1163,9 +871,7 @@ function ComplianceListV2() {
                                   {complianceData?.map((item, index) => {
                                     return (
                                       <OverlayTrigger
-                                        placement={
-                                          panelRight ? "left" : "right"
-                                        }
+                                        placement="right"
                                         key={index}
                                         delay={{ show: 250, hide: 400 }}
                                         overlay={
@@ -1253,9 +959,6 @@ function ComplianceListV2() {
                                   })}
                                 </ListGroup>
                               </Col>
-                              {panelRight ? (
-                                <></>
-                              ) : (
                                 <Col
                                   sm={8}
                                   className="vh-100 overflow-auto"
@@ -1297,7 +1000,6 @@ function ComplianceListV2() {
                                     })}
                                   </Tab.Content>
                                 </Col>
-                              )}
                             </Row>
                           </Tab.Container>
                         </>
@@ -1357,7 +1059,17 @@ function ComplianceListV2() {
                     <Loading />
                   )}
                 </Tab.Pane>
-                <Tab.Pane eventKey="#link2">Blank</Tab.Pane>
+                <Tab.Pane eventKey="#link2">
+                  <Checklist 
+                    compData={complianceData} 
+                    complianceDataOriginal={complianceDataOriginal} 
+                    checkData={checklistData} pk={pk} 
+                    proposalTitle={proposalData.title}
+                    searchInput={searchInput}
+                    updateSearchInput={updateSearchInput}
+                    updateFocusData={updateFocusData}
+                  />
+                </Tab.Pane>
                 <Tab.Pane eventKey="#link3">
                   <Outline textArray={aiData} proposalData={proposalData} />
                 </Tab.Pane>
