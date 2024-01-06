@@ -51,7 +51,6 @@ import Splitter from "./Splitter";
 function ComplianceListV2() {
   const { pk } = useParams();
   const [editMode, updateEditMode] = useState(false);
-  const [panelRight, updatePanelRight] = useState(false);
   const [proposalData, updateProposalData] = useState(false);
   const [complianceData, updateComplianceData] = useState();
   const [imageMode, updateImageMode] = useState(false);
@@ -612,13 +611,13 @@ function ComplianceListV2() {
                   </Container>
                 </ListGroup.Item>
                 <ListGroup.Item action href="#link1">
-                  Compliance
+                  Viewer
                 </ListGroup.Item>
                 {proposalData.nofo ? (
                   <>
-                    {/* <ListGroup.Item action href="#link2">
-                Calendar
-                </ListGroup.Item> */}
+                    <ListGroup.Item action href="#link2">
+                      Checklist
+                    </ListGroup.Item>
                     <ListGroup.Item action href="#link3">
                       Outline
                     </ListGroup.Item>
@@ -722,28 +721,15 @@ function ComplianceListV2() {
                       ) : (
                         //viewing
                         <>
-                          <Navbar
+                          {/* <Navbar
                             style={{
                               borderBottom: "3px solid rgb(212, 212, 212)",
                             }}
                             variant="light"
                             bg="white"
                             className="d-flex justify-content-center mb-2"
-                          >
-                            {panelRight ? (
-                              <Col
-                                onClick={() => updatePanelRight(false)}
-                                style={{ maxWidth: "5vw", cursor: "pointer" }}
-                              >
-                                <FontAwesomeIcon
-                                  size="2xl"
-                                  icon={faArrowLeft}
-                                />
-                              </Col>
-                            ) : (
-                              <></>
-                            )}
-                            <Dropdown>
+                          > */}
+                            {/* <Dropdown>
                               <Dropdown.Toggle
                                 style={{ backgroundColor: "white" }}
                                 id="dropdown-basic"
@@ -861,11 +847,11 @@ function ComplianceListV2() {
                                   </>
                                 )}
                               </Dropdown.Menu>
-                            </Dropdown>
+                            </Dropdown> */}
                             {/* <Col style={{ padding: "3px", backgroundColor: "#AEBC37", borderRadius: "5px", marginLeft:'1vw', marginRight:'1vw'}} onDragOver={(e) => handleAllowDrop(e)} onDrop={(e) => handleDropCalendar(e)}>
         <FontAwesomeIcon size="2xl" icon={faCalendar} />
     </Col> */}
-                            <Col
+                            {/* <Col
                               style={{
                                 padding: "3px",
                                 backgroundColor: "#9ab6da",
@@ -985,8 +971,8 @@ function ComplianceListV2() {
                                   )}
                                 </Dropdown.Menu>
                               </Dropdown>
-                            </Col>
-                            <Col
+                            </Col> */}
+                            {/* <Col
                               style={{
                                 padding: "3px",
                                 backgroundColor: "#f44336",
@@ -999,160 +985,22 @@ function ComplianceListV2() {
                               onDrop={(e) => handleDropDelete(e)}
                             >
                               <FontAwesomeIcon size="2xl" icon={faTrashCan} />
-                            </Col>
-                            {panelRight ? (
-                              <></>
-                            ) : (
-                              <Col
-                                onClick={() => updatePanelRight(true)}
-                                style={{ maxWidth: "5vw", cursor: "pointer" }}
-                              >
-                                <FontAwesomeIcon
-                                  size="2xl"
-                                  icon={faArrowRight}
-                                />
-                              </Col>
-                            )}
-                          </Navbar>
+                            </Col> */}
+                          {/* </Navbar> */}
                           <Tab.Container
                             id="list-group-tabs"
                             defaultActiveKey="#link1"
                           >
-                            <Row>
-                              {panelRight ? (
-                                <Col
-                                  sm={8}
-                                  className="vh-100 d-flex justify-content-center overflow-scroll"
-                                  style={{ maxHeight: "90vh" }}
-                                >
-                                  <Form style={{ width: "100%" }}>
-                                    <Button
-                                      style={{ marginBottom: "1vh" }}
-                                      onClick={() => handleAddToChecklist()}
-                                    >
-                                      <FontAwesomeIcon
-                                        size="sm"
-                                        icon={faPlus}
-                                      />
-                                    </Button>
-                                    <Button
-                                      style={{
-                                        marginBottom: "1vh",
-                                        marginLeft: "1vh",
-                                        marginRight: "1vh",
-                                      }}
-                                      onClick={() => handleSaveChecklist()}
-                                    >
-                                      <FontAwesomeIcon
-                                        size="sm"
-                                        icon={faFloppyDisk}
-                                      />
-                                    </Button>
-                                    <CsvDownloadButton
-                                      style={{ marginBottom: "1vh" }}
-                                      className="btn btn-primary"
-                                      data={checklistData}
-                                      delimiter=","
-                                    >
-                                      <FontAwesomeIcon
-                                        size="sm"
-                                        icon={faFileCsv}
-                                      />
-                                    </CsvDownloadButton>
-                                    <Table striped bordered hover>
-                                      <thead>
-                                        <tr>
-                                          <th>Pg.</th>
-                                          <th>Item</th>
-                                          <th>Details</th>
-                                        </tr>
-                                      </thead>
-                                      <tbody>
-                                        {checklistData?.map((item, index) => {
-                                          return (
-                                            <tr
-                                              key={index}
-                                              name={item.id
-                                                .toString()
-                                                .concat("_item")}
-                                            >
-                                              <td style={{ maxWidth: "10vh" }}>
-                                                <Form.Control
-                                                  name={item.id
-                                                    .toString()
-                                                    .concat("_pages")}
-                                                  as="textarea"
-                                                  value={item.pages}
-                                                  onChange={(e) =>
-                                                    handleChecklistChange(e)
-                                                  }
-                                                />
-                                              </td>
-                                              <td
-                                                style={{
-                                                  maxWidth: "20vh",
-                                                  cursor: "grab",
-                                                }}
-                                                draggable
-                                                onDragStart={(e) =>
-                                                  handleDragSection(e, item.id)
-                                                }
-                                                onDragOver={(e) =>
-                                                  handleAllowDrop(e)
-                                                }
-                                                onDrop={(e) =>
-                                                  handleDropSection(e)
-                                                }
-                                              >
-                                                <Form.Control
-                                                  name={item.id
-                                                    .toString()
-                                                    .concat("_item")}
-                                                  as="textarea"
-                                                  value={item.item}
-                                                  onChange={(e) =>
-                                                    handleChecklistChange(e)
-                                                  }
-                                                />
-                                              </td>
-                                              <td>
-                                                <Form.Control
-                                                  name={item.id
-                                                    .toString()
-                                                    .concat("_data")}
-                                                  as="textarea"
-                                                  value={item.data}
-                                                  style={{ minWidth: "50vh" }}
-                                                  onDragOver={(e) =>
-                                                    handleAllowDrop(e)
-                                                  }
-                                                  onDrop={(e) =>
-                                                    handleDropSection(e)
-                                                  }
-                                                  onChange={(e) =>
-                                                    handleChecklistChange(e)
-                                                  }
-                                                />
-                                              </td>
-                                            </tr>
-                                          );
-                                        })}
-                                      </tbody>
-                                    </Table>
-                                  </Form>
-                                </Col>
-                              ) : (
-                                <></>
-                              )}
+                            <Row style={{marginTop: "1vh"}}>
                               <Col
                                 sm={4}
                                 className="vh-100 overflow-auto"
                                 style={{ maxHeight: "90vh" }}
                               >
                                 <ListGroup>
-                                  <InputGroup className="mb-3">
+                                  <InputGroup className="mb-1">
                                     <InputGroup.Text>
-                                      NOFO Search
+                                      Header Search
                                     </InputGroup.Text>
                                     <Form.Control
                                       aria-label="search"
@@ -1160,12 +1008,149 @@ function ComplianceListV2() {
                                       onChange={(e) => handleNofoSearch(e)}
                                     />
                                   </InputGroup>
+                                  <Row className="mb-3 g-1">
+                                  <Col>
+                                  <Dropdown>
+                                    <Dropdown.Toggle
+                                      style={{ backgroundColor: "white" , width: "100%"}}
+                                      id="dropdown-basic"
+                                    >
+                                      {activeSectionData}
+                                    </Dropdown.Toggle>
+                                    <Dropdown.Menu style={{width: "100%"}}>
+                                      {Object.keys(sectionData)?.map(
+                                        (item, index) => {
+                                          return (
+                                            <Dropdown.Item
+                                              name={item}
+                                              key={index}
+                                              onClick={(e) => handleActiveFilter(e)}
+                                            >
+                                              {item}: {sectionData[item][0]}-
+                                              {sectionData[item][1]}
+                                            </Dropdown.Item>
+                                          );
+                                        },
+                                      )}
+                                      <Dropdown.Item
+                                        name="flagged"
+                                        onClick={(e) => handleActiveFilter(e)}
+                                      >
+                                        <FontAwesomeIcon color="red" icon={faFlag} />{" "}
+                                        Flagged Content
+                                      </Dropdown.Item>
+                                      {addingSection.adding ? (
+                                        <Container
+                                          style={{
+                                            paddingTop: "1vh",
+                                            borderTop: "3px solid rgb(212, 212, 212)",
+                                            display: "flex",
+                                            flexDirection: "column",
+                                            width: "100%"
+                                          }}
+                                        >
+                                          <textarea
+                                            type="text"
+                                            name="section"
+                                            placeholder="Section Name"
+                                            onChange={(e) =>
+                                              handleChangeNewSection(e)
+                                            }
+                                          />
+                                          <input
+                                            type="number"
+                                            name="start"
+                                            placeholder="Page Start (Number Only)"
+                                            onChange={(e) =>
+                                              handleChangeNewSection(e)
+                                            }
+                                          />
+                                          <input
+                                            type="number"
+                                            name="end"
+                                            placeholder="Page End (Number Only)"
+                                            onChange={(e) =>
+                                              handleChangeNewSection(e)
+                                            }
+                                          />
+                                          <Row>
+                                            <Dropdown.Item
+                                              onClick={() => handleSubmitNewSection()}
+                                            >
+                                              <FontAwesomeIcon
+                                                size="sm"
+                                                icon={faFloppyDisk}
+                                              />
+                                            </Dropdown.Item>
+                                            <Dropdown.Item
+                                              onClick={() =>
+                                                updateAddingSection({
+                                                  adding: false,
+                                                  section: null,
+                                                  start: null,
+                                                  end: null,
+                                                })
+                                              }
+                                            >
+                                              <FontAwesomeIcon size="sm" icon={faX} />
+                                            </Dropdown.Item>
+                                          </Row>
+                                        </Container>
+                                      ) : (
+                                        <>
+                                          <Dropdown.Item
+                                            onClick={() => {
+                                              updateComplianceData(
+                                                proposalData.complianceimages_set,
+                                              );
+                                              updateActiveSectionData(
+                                                "Section Filters",
+                                              );
+                                            }}
+                                          >
+                                            <FontAwesomeIcon
+                                              size="sm"
+                                              icon={faClockRotateLeft}
+                                            />{" "}
+                                            Reset
+                                          </Dropdown.Item>
+                                          <Dropdown.Item
+                                            onMouseEnter={() =>
+                                              updateAddingSection({
+                                                ...addingSection,
+                                                adding: true,
+                                              })
+                                            }
+                                          >
+                                            <FontAwesomeIcon
+                                              size="sm"
+                                              icon={faPlus}
+                                            />{" "}
+                                            Add
+                                          </Dropdown.Item>
+                                        </>
+                                      )}
+                                    </Dropdown.Menu>
+                                  </Dropdown>
+                                  </Col>
+                                  <Col
+                                    onDragOver={(e) => handleAllowDrop(e)}
+                                    onDrop={(e) => handleDropDelete(e)}
+                                  >
+                                  <Button style={{
+                                      border: "1px solid #f44336",
+                                      borderRadius: "5px",
+                                      width: "100%",
+                                      backgroundColor: "white"
+                                    }}>
+                                    <FontAwesomeIcon size="xl" icon={faTrashCan} />
+                                  </Button>
+                                  </Col>
+                                  </Row>
                                   {complianceData?.map((item, index) => {
                                     return (
                                       <OverlayTrigger
-                                        placement={
-                                          panelRight ? "left" : "right"
-                                        }
+                                        placement="right"
                                         key={index}
                                         delay={{ show: 250, hide: 400 }}
                                         overlay={
@@ -1253,9 +1238,6 @@ function ComplianceListV2() {
                                   })}
                                 </ListGroup>
                               </Col>
-                              {panelRight ? (
-                                <></>
-                              ) : (
                                 <Col
                                   sm={8}
                                   className="vh-100 overflow-auto"
@@ -1297,7 +1279,6 @@ function ComplianceListV2() {
                                     })}
                                   </Tab.Content>
                                 </Col>
-                              )}
                             </Row>
                           </Tab.Container>
                         </>
@@ -1357,7 +1338,356 @@ function ComplianceListV2() {
                     <Loading />
                   )}
                 </Tab.Pane>
-                <Tab.Pane eventKey="#link2">Blank</Tab.Pane>
+                <Tab.Pane eventKey="#link2">
+                  <Row style={{marginTop: "1vh"}}>
+                    <Col
+                      sm={4}
+                      className="vh-100 overflow-auto"
+                      style={{ maxHeight: "90vh" }}
+                    >
+                      <ListGroup>
+                        <InputGroup className="mb-1">
+                          <InputGroup.Text>
+                            Header Search
+                          </InputGroup.Text>
+                          <Form.Control
+                            aria-label="search"
+                            value={searchInput}
+                            onChange={(e) => handleNofoSearch(e)}
+                          />
+                        </InputGroup>
+                        <Row className="mb-3 g-1">
+                        <Col>
+                        <Dropdown>
+                          <Dropdown.Toggle
+                            style={{ backgroundColor: "white" , width: "100%"}}
+                            id="dropdown-basic"
+                          >
+                            {activeSectionData}
+                          </Dropdown.Toggle>
+                          <Dropdown.Menu style={{width: "100%"}}>
+                            {Object.keys(sectionData)?.map(
+                              (item, index) => {
+                                return (
+                                  <Dropdown.Item
+                                    name={item}
+                                    key={index}
+                                    onClick={(e) => handleActiveFilter(e)}
+                                  >
+                                    {item}: {sectionData[item][0]}-
+                                    {sectionData[item][1]}
+                                  </Dropdown.Item>
+                                );
+                              },
+                            )}
+                            <Dropdown.Item
+                              name="flagged"
+                              onClick={(e) => handleActiveFilter(e)}
+                            >
+                              <FontAwesomeIcon color="red" icon={faFlag} />{" "}
+                              Flagged Content
+                            </Dropdown.Item>
+                            {addingSection.adding ? (
+                              <Container
+                                style={{
+                                  paddingTop: "1vh",
+                                  borderTop: "3px solid rgb(212, 212, 212)",
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  width: "100%"
+                                }}
+                              >
+                                <textarea
+                                  type="text"
+                                  name="section"
+                                  placeholder="Section Name"
+                                  onChange={(e) =>
+                                    handleChangeNewSection(e)
+                                  }
+                                />
+                                <input
+                                  type="number"
+                                  name="start"
+                                  placeholder="Page Start (Number Only)"
+                                  onChange={(e) =>
+                                    handleChangeNewSection(e)
+                                  }
+                                />
+                                <input
+                                  type="number"
+                                  name="end"
+                                  placeholder="Page End (Number Only)"
+                                  onChange={(e) =>
+                                    handleChangeNewSection(e)
+                                  }
+                                />
+                                <Row>
+                                  <Dropdown.Item
+                                    onClick={() => handleSubmitNewSection()}
+                                  >
+                                    <FontAwesomeIcon
+                                      size="sm"
+                                      icon={faFloppyDisk}
+                                    />
+                                  </Dropdown.Item>
+                                  <Dropdown.Item
+                                    onClick={() =>
+                                      updateAddingSection({
+                                        adding: false,
+                                        section: null,
+                                        start: null,
+                                        end: null,
+                                      })
+                                    }
+                                  >
+                                    <FontAwesomeIcon size="sm" icon={faX} />
+                                  </Dropdown.Item>
+                                </Row>
+                              </Container>
+                            ) : (
+                              <>
+                                <Dropdown.Item
+                                  onClick={() => {
+                                    updateComplianceData(
+                                      proposalData.complianceimages_set,
+                                    );
+                                    updateActiveSectionData(
+                                      "Section Filters",
+                                    );
+                                  }}
+                                >
+                                  <FontAwesomeIcon
+                                    size="sm"
+                                    icon={faClockRotateLeft}
+                                  />{" "}
+                                  Reset
+                                </Dropdown.Item>
+                                <Dropdown.Item
+                                  onMouseEnter={() =>
+                                    updateAddingSection({
+                                      ...addingSection,
+                                      adding: true,
+                                    })
+                                  }
+                                >
+                                  <FontAwesomeIcon
+                                    size="sm"
+                                    icon={faPlus}
+                                  />{" "}
+                                  Add
+                                </Dropdown.Item>
+                              </>
+                            )}
+                          </Dropdown.Menu>
+                        </Dropdown>
+                        </Col>
+                        <Col
+                          onDragOver={(e) => handleAllowDrop(e)}
+                          onDrop={(e) => handleDropDelete(e)}
+                        >
+                        <Button style={{
+                            border: "1px solid #f44336",
+                            borderRadius: "5px",
+                            width: "100%",
+                            backgroundColor: "white"
+                          }}>
+                          <FontAwesomeIcon size="xl" icon={faTrashCan} />
+                        </Button>
+                        </Col>
+                        </Row>
+                        {complianceData?.map((item, index) => {
+                          return (
+                            <>
+                              {item.content_text.length === 0 ||
+                              item.content_text === "\f" ? (
+                                <ListGroup.Item
+                                  className="d-flex justify-content-center bg-dark"
+                                  action
+                                  name={item.id}
+                                  key={index}
+                                  href={`#link${index}`}
+                                  draggable="false"
+                                  onDragStart={(e) => handleDrag(e)}
+                                >
+                                  <FontAwesomeIcon
+                                    onClick={() =>
+                                      handleFlagged(item.id)
+                                    }
+                                    style={{ marginRight: "2px" }}
+                                    color={item.flagged}
+                                    size="sm"
+                                    icon={faFlag}
+                                  />
+                                  <img
+                                    src={item.title}
+                                    name={item.id}
+                                    alt={index}
+                                    style={{
+                                      maxWidth: "50vh",
+                                      height: "auto",
+                                      borderRadius: "5px",
+                                    }}
+                                  />
+                                </ListGroup.Item>
+                              ) : (
+                                <ListGroup.Item
+                                  className="d-flex justify-content-center"
+                                  action
+                                  name={item.id}
+                                  key={index}
+                                  href={`#link${index}`}
+                                  draggable="true"
+                                  onDragStart={(e) => handleDrag(e)}
+                                >
+                                  <FontAwesomeIcon
+                                    onClick={() =>
+                                      handleFlagged(item.id)
+                                    }
+                                    style={{ marginRight: "2px" }}
+                                    color={item.flagged}
+                                    size="sm"
+                                    icon={faFlag}
+                                  />
+                                  <img
+                                    src={item.title}
+                                    name={item.id}
+                                    alt={index}
+                                    style={{
+                                      maxWidth: "50vh",
+                                      height: "auto",
+                                      borderRadius: "5px",
+                                    }}
+                                  />
+                                </ListGroup.Item>
+                              )}
+                            </>
+                          );
+                        })}
+                      </ListGroup>
+                    </Col>
+                    <Col
+                      sm={8}
+                      className="vh-100 d-flex justify-content-center overflow-scroll"
+                      style={{ maxHeight: "90vh" }}
+                    >
+                      <Form style={{ width: "100%" }}>
+                        <Button
+                          style={{ marginBottom: "1vh" }}
+                          onClick={() => handleAddToChecklist()}
+                        >
+                          <FontAwesomeIcon
+                            size="sm"
+                            icon={faPlus}
+                          />
+                        </Button>
+                        <Button
+                          style={{
+                            marginBottom: "1vh",
+                            marginLeft: "1vh",
+                            marginRight: "1vh",
+                          }}
+                          onClick={() => handleSaveChecklist()}
+                        >
+                          <FontAwesomeIcon
+                            size="sm"
+                            icon={faFloppyDisk}
+                          />
+                        </Button>
+                        <CsvDownloadButton
+                          style={{ marginBottom: "1vh" }}
+                          className="btn btn-primary"
+                          data={checklistData}
+                          delimiter=","
+                        >
+                          <FontAwesomeIcon
+                            size="sm"
+                            icon={faFileCsv}
+                          />
+                        </CsvDownloadButton>
+                        <Table striped bordered hover>
+                          <thead>
+                            <tr>
+                              <th>Pg.</th>
+                              <th>Item</th>
+                              <th>Details</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {checklistData?.map((item, index) => {
+                              return (
+                                <tr
+                                  key={index}
+                                  name={item.id
+                                    .toString()
+                                    .concat("_item")}
+                                >
+                                  <td style={{ maxWidth: "10vh" }}>
+                                    <Form.Control
+                                      name={item.id
+                                        .toString()
+                                        .concat("_pages")}
+                                      as="textarea"
+                                      value={item.pages}
+                                      onChange={(e) =>
+                                        handleChecklistChange(e)
+                                      }
+                                    />
+                                  </td>
+                                  <td
+                                    style={{
+                                      maxWidth: "20vh",
+                                      cursor: "grab",
+                                    }}
+                                    draggable
+                                    onDragStart={(e) =>
+                                      handleDragSection(e, item.id)
+                                    }
+                                    onDragOver={(e) =>
+                                      handleAllowDrop(e)
+                                    }
+                                    onDrop={(e) =>
+                                      handleDropSection(e)
+                                    }
+                                  >
+                                    <Form.Control
+                                      name={item.id
+                                        .toString()
+                                        .concat("_item")}
+                                      as="textarea"
+                                      value={item.item}
+                                      onChange={(e) =>
+                                        handleChecklistChange(e)
+                                      }
+                                    />
+                                  </td>
+                                  <td>
+                                    <Form.Control
+                                      name={item.id
+                                        .toString()
+                                        .concat("_data")}
+                                      as="textarea"
+                                      value={item.data}
+                                      style={{ minWidth: "50vh" }}
+                                      onDragOver={(e) =>
+                                        handleAllowDrop(e)
+                                      }
+                                      onDrop={(e) =>
+                                        handleDropSection(e)
+                                      }
+                                      onChange={(e) =>
+                                        handleChecklistChange(e)
+                                      }
+                                    />
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </Table>
+                      </Form>
+                    </Col>
+                  </Row>
+                </Tab.Pane>
                 <Tab.Pane eventKey="#link3">
                   <Outline textArray={aiData} proposalData={proposalData} />
                 </Tab.Pane>
