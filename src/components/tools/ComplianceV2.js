@@ -9,7 +9,6 @@ import Button from "react-bootstrap/Button";
 import React, { useEffect, useState, useRef } from "react";
 import axiosInstance from "../../axios";
 import Loading from "../Loading";
-import Navbar from "react-bootstrap/Navbar";
 import Dropdown from "react-bootstrap/Dropdown";
 
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
@@ -23,15 +22,11 @@ import {
   faPenToSquare,
   faTrashCan,
   faUndo,
-  faCalendar,
-  faFileWord,
   faPlus,
   faX,
   faFloppyDisk,
   faClockRotateLeft,
   faFlag,
-  faArrowRight,
-  faArrowLeft,
   faFileCsv,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -412,19 +407,19 @@ function ComplianceListV2() {
     updateImageMode(e);
   };
 
-  const handleChangeNewPrompt = (e) => {
-    var addingPromptCopy = addingPrompt;
-    addingPromptCopy[e.target.name] = e.target.value.trim();
-    updateAddingPrompt(addingPromptCopy);
-  };
+  // const handleChangeNewPrompt = (e) => {
+  //   var addingPromptCopy = addingPrompt;
+  //   addingPromptCopy[e.target.name] = e.target.value.trim();
+  //   updateAddingPrompt(addingPromptCopy);
+  // };
 
-  const handleSavePrompt = (prompt) => {
-    var currentPromptsCopy = aiPrompts;
-    currentPromptsCopy.push(prompt);
-    updateActiveAiPrompt(prompt);
-    updateAddingPrompt({ adding: false, prompt: null });
-    updateAiPrompts(currentPromptsCopy);
-  };
+  // const handleSavePrompt = (prompt) => {
+  //   var currentPromptsCopy = aiPrompts;
+  //   currentPromptsCopy.push(prompt);
+  //   updateActiveAiPrompt(prompt);
+  //   updateAddingPrompt({ adding: false, prompt: null });
+  //   updateAiPrompts(currentPromptsCopy);
+  // };
 
   const handleChangeProposalTitle = (e) => {
     let proposalDataCopy = { ...proposalData };
@@ -541,10 +536,6 @@ function ComplianceListV2() {
         alert(`Compliance Checklist Saved for ${proposalData.title}!`);
       });
   };
-
-  // const handleCsvExport = () => {
-
-  // }
 
   const handleNofoSearch = (e) => {
     if (e.target.value.toLowerCase().length === 0) {
@@ -721,136 +712,6 @@ function ComplianceListV2() {
                       ) : (
                         //viewing
                         <>
-                          {/* <Navbar
-                            style={{
-                              borderBottom: "3px solid rgb(212, 212, 212)",
-                            }}
-                            variant="light"
-                            bg="white"
-                            className="d-flex justify-content-center mb-2"
-                          > */}
-                            {/* <Dropdown>
-                              <Dropdown.Toggle
-                                style={{ backgroundColor: "white" }}
-                                id="dropdown-basic"
-                              >
-                                {activeSectionData}
-                              </Dropdown.Toggle>
-                              <Dropdown.Menu>
-                                {Object.keys(sectionData)?.map(
-                                  (item, index) => {
-                                    return (
-                                      <Dropdown.Item
-                                        name={item}
-                                        key={index}
-                                        onClick={(e) => handleActiveFilter(e)}
-                                      >
-                                        {item}: {sectionData[item][0]}-
-                                        {sectionData[item][1]}
-                                      </Dropdown.Item>
-                                    );
-                                  },
-                                )}
-                                <Dropdown.Item
-                                  name="flagged"
-                                  onClick={(e) => handleActiveFilter(e)}
-                                >
-                                  <FontAwesomeIcon color="red" icon={faFlag} />{" "}
-                                  Flagged Content
-                                </Dropdown.Item>
-                                {addingSection.adding ? (
-                                  <Container
-                                    style={{
-                                      paddingTop: "1vh",
-                                      borderTop: "3px solid rgb(212, 212, 212)",
-                                    }}
-                                  >
-                                    <textarea
-                                      type="text"
-                                      name="section"
-                                      placeholder="Section Name"
-                                      onChange={(e) =>
-                                        handleChangeNewSection(e)
-                                      }
-                                    />
-                                    <input
-                                      type="number"
-                                      name="start"
-                                      placeholder="Page Start (Number Only)"
-                                      onChange={(e) =>
-                                        handleChangeNewSection(e)
-                                      }
-                                    />
-                                    <input
-                                      type="number"
-                                      name="end"
-                                      placeholder="Page End (Number Only)"
-                                      onChange={(e) =>
-                                        handleChangeNewSection(e)
-                                      }
-                                    />
-                                    <Row>
-                                      <Dropdown.Item
-                                        onClick={() => handleSubmitNewSection()}
-                                      >
-                                        <FontAwesomeIcon
-                                          size="sm"
-                                          icon={faFloppyDisk}
-                                        />
-                                      </Dropdown.Item>
-                                      <Dropdown.Item
-                                        onClick={() =>
-                                          updateAddingSection({
-                                            adding: false,
-                                            section: null,
-                                            start: null,
-                                            end: null,
-                                          })
-                                        }
-                                      >
-                                        <FontAwesomeIcon size="sm" icon={faX} />
-                                      </Dropdown.Item>
-                                    </Row>
-                                  </Container>
-                                ) : (
-                                  <>
-                                    <Dropdown.Item
-                                      onClick={() => {
-                                        updateComplianceData(
-                                          proposalData.complianceimages_set,
-                                        );
-                                        updateActiveSectionData(
-                                          "Section Filters",
-                                        );
-                                      }}
-                                    >
-                                      <FontAwesomeIcon
-                                        size="sm"
-                                        icon={faClockRotateLeft}
-                                      />{" "}
-                                      Reset
-                                    </Dropdown.Item>
-                                    <Dropdown.Item
-                                      onMouseEnter={() =>
-                                        updateAddingSection({
-                                          ...addingSection,
-                                          adding: true,
-                                        })
-                                      }
-                                    >
-                                      <FontAwesomeIcon
-                                        size="sm"
-                                        icon={faPlus}
-                                      />{" "}
-                                      Add
-                                    </Dropdown.Item>
-                                  </>
-                                )}
-                              </Dropdown.Menu>
-                            </Dropdown> */}
-                            {/* <Col style={{ padding: "3px", backgroundColor: "#AEBC37", borderRadius: "5px", marginLeft:'1vw', marginRight:'1vw'}} onDragOver={(e) => handleAllowDrop(e)} onDrop={(e) => handleDropCalendar(e)}>
-        <FontAwesomeIcon size="2xl" icon={faCalendar} />
-    </Col> */}
                             {/* <Col
                               style={{
                                 padding: "3px",
@@ -971,20 +832,6 @@ function ComplianceListV2() {
                                   )}
                                 </Dropdown.Menu>
                               </Dropdown>
-                            </Col> */}
-                            {/* <Col
-                              style={{
-                                padding: "3px",
-                                backgroundColor: "#f44336",
-                                borderRadius: "5px",
-                                marginLeft: "1vw",
-                                marginRight: "1vw",
-                                maxWidth: "30vw",
-                              }}
-                              onDragOver={(e) => handleAllowDrop(e)}
-                              onDrop={(e) => handleDropDelete(e)}
-                            >
-                              <FontAwesomeIcon size="2xl" icon={faTrashCan} />
                             </Col> */}
                           {/* </Navbar> */}
                           <Tab.Container
