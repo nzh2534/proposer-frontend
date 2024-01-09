@@ -81,7 +81,7 @@ const Splitter = ({item, alt, refresh}) => {
           ref={imageRef}
           src={item.content}
           alt={alt}
-          style={{ width: '100%', height: 'auto', cursor: "crosshair"}}
+          style={{ cursor: "crosshair"}}
         />
 
         {drawing && (
