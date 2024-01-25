@@ -121,8 +121,7 @@ function Create({ proposals }) {
               onChange={handleChange}
             >
               <option value=""></option>
-              <option value="Momodu">Momodu</option>
-              <option value="Claude">Claude</option>
+              <option value={localStorage.getItem("username")}>{localStorage.getItem("username")}</option>
             </Form.Select>
           </Form.Group>
         </Col>

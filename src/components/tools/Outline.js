@@ -11,7 +11,7 @@ import GoogleButton from "react-google-button";
 const API_KEY = process.env.REACT_APP_API_GOOGLE_KEY;
 
 function Outline({ textArray, proposalData }) {
-  var testHeader = "\nCOVER PAGE";
+  var testHeader = " ";
   var instructionText =
     "\n\nINSTRUCTIONS FOR THIS DOCUMENT:\n(1) All highlighted text should eventually be deleted\n";
   const [googleLoggedIn, updateGoogleLoggedIn] = useState(false);
@@ -25,7 +25,7 @@ function Outline({ textArray, proposalData }) {
   );
   const [headerId, updateHeaderId] = useState("");
   const [documentIndex, updateDocumentIndex] = useState(
-    testHeader.length + instructionText.length + 1,
+    testHeader.length,
   );
   const [requests, updateRequests] = useState([
     // {
@@ -47,14 +47,14 @@ function Outline({ textArray, proposalData }) {
         },
       },
     },
-    {
-      insertText: {
-        text: instructionText,
-        location: {
-          index: testHeader.length + 1,
-        },
-      },
-    },
+    // {
+    //   insertText: {
+    //     text: instructionText,
+    //     location: {
+    //       index: testHeader.length + 1,
+    //     },
+    //   },
+    // },
   ]);
 
   function start() {
@@ -258,17 +258,16 @@ function Outline({ textArray, proposalData }) {
     const formData = new FormData(e.target),
       formDataObj = Object.fromEntries(formData.entries());
     let newRequests = [
-      {
-        insertSectionBreak: {
-          sectionType: "NEXT_PAGE",
-          location: {
-            index: documentIndex,
-          },
-        },
-      },
+      // {
+      //   insertSectionBreak: {
+      //     sectionType: "NEXT_PAGE",
+      //     location: {
+      //       index: documentIndex,
+      //     },
+      //   },
+      // },
     ];
     sectionCountArr.forEach((item) => {
-      if (item > 1) {
         var pagesInSection = formDataObj[`${item}_pages`];
         newRequests.push({
           insertText: {
@@ -317,8 +316,8 @@ function Outline({ textArray, proposalData }) {
             },
           });
         }
-      }
-    });
+      });
+    newRequests.pop();
     let finalRequests = [...requests];
     newRequests.reverse().forEach((item) => {
       finalRequests.push(item);

@@ -13,7 +13,7 @@ function CollapsibleNavbar({ count }) {
       expand="lg"
       bg="dark"
       variant="dark"
-      style={{ width: "100%" }}
+      style={{zoom: "67%"}}
     >
       <Container className="ms-0 w-auto">
         <Navbar.Brand href="/">
