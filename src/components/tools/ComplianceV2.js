@@ -154,7 +154,7 @@ function ComplianceListV2({proposals, templates}) {
 
   const files = acceptedFiles.map((file) => (
     <li key={file.path}>
-      {file.path} - {file.size} - {file.type}bytes
+      {file.path} - {file.size} - {file.type} bytes
     </li>
   ));
 
@@ -180,6 +180,11 @@ function ComplianceListV2({proposals, templates}) {
       formData.append("doc_start", startPage);
       formData.append("doc_end", endPage);
       formData.append("loading", "True");
+      if(aiEnabled){
+        formData.append("questions", selectedTemplate);
+      } else {
+        formData.append("questions", "False");
+      }
       axiosInstance.defaults.headers["Content-Type"] = "multipart/form-data";
       axiosInstance.defaults.timeout = 2000000; // axiosInstance.timeout = 2000000;
       axiosInstance
@@ -192,9 +197,7 @@ function ComplianceListV2({proposals, templates}) {
         .then((res) => {
           axiosInstance.defaults.headers["Content-Type"] = "application/json";
           axiosInstance.defaults.timeout = 30000;
-          if (res.status === 200) {
-            console.log(res.data);
-          }
+          console.log(res.data);
         });
     }
   };
@@ -1275,7 +1278,7 @@ function ComplianceListV2({proposals, templates}) {
                                             <Dropdown.Item
                                               name={item.name}
                                               key={index}
-                                              onClick={(e) => setSelectedTemplate(e)}
+                                              onClick={() => setSelectedTemplate(item.checklist)}
                                             >
                                               {item.name}
                                             </Dropdown.Item>
