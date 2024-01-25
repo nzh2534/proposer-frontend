@@ -181,9 +181,7 @@ function ComplianceListV2({proposals, templates}) {
       formData.append("doc_end", endPage);
       formData.append("loading", "True");
       if(aiEnabled){
-        formData.append("questions", selectedTemplate);
-      } else {
-        formData.append("questions", "False");
+        formData.append("checklist", selectedTemplate);
       }
       axiosInstance.defaults.headers["Content-Type"] = "multipart/form-data";
       axiosInstance.defaults.timeout = 2000000; // axiosInstance.timeout = 2000000;
