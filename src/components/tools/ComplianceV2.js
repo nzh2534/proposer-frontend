@@ -176,26 +176,28 @@ function ComplianceListV2({proposals, templates}) {
       updateRunningTrigger(true);
       let formData = new FormData();
       formData.append("title", proposalData.title);
-      formData.append("nofo", new Blob(acceptedFiles[0], { type: 'application/octet-stream' }));
+      formData.append("nofo", acceptedFiles[0]);
       formData.append("doc_start", startPage);
       formData.append("doc_end", endPage);
       formData.append("loading", "True");
       if(aiEnabled){
-        formData.append("checklist", JSON.stringify(selectedTemplate.checklist));
+        formData.append("checklist", new Blob([JSON.stringify(selectedTemplate.checklist)], {
+          type: "application/json"
+        }));
       }
-      // axiosInstance.defaults.headers["Content-Type"] = "multipart/form-data";
+      axiosInstance.defaults.headers["Content-Type"] = "multipart/form-data";
       axiosInstance.defaults.timeout = 2000000; // axiosInstance.timeout = 2000000;
       axiosInstance
         .put(`proposals/${pk}/update/`, formData)
         .catch((error) => {
-          // axiosInstance.defaults.headers["Content-Type"] = "application/json";
+          axiosInstance.defaults.headers["Content-Type"] = "application/json";
           axiosInstance.defaults.timeout = 30000;
-          console.log(error.response);
+          console.log(error);
         })
         .then((res) => {
-          // axiosInstance.defaults.headers["Content-Type"] = "application/json";
+          axiosInstance.defaults.headers["Content-Type"] = "application/json";
           axiosInstance.defaults.timeout = 30000;
-          console.log(res.data);
+          console.log(res);
         });
     }
   };
