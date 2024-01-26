@@ -177,7 +177,7 @@ function ComplianceListV2({proposals, templates}) {
       let formData = new FormData();
       formData.append("title", proposalData.title);
       formData.append("nofo", acceptedFiles[0]);
-      formData.append("nofo", new Blob(acceptedFiles[0], { type: "multipart/form-data" }));
+      formData.append("nofo", new Blob(acceptedFiles[0], { type: 'application/octet-stream' }));
       formData.append("doc_start", startPage);
       formData.append("doc_end", endPage);
       formData.append("loading", "True");
