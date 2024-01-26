@@ -181,7 +181,7 @@ function ComplianceListV2({proposals, templates}) {
       formData.append("doc_end", endPage);
       formData.append("loading", "True");
       if(aiEnabled){
-        formData.append("checklist", new Blob([JSON.parse(selectedTemplate.checklist)], {
+        formData.append("checklist", new Blob([selectedTemplate.checklist], {
           type: "application/json"
         }));
       }
