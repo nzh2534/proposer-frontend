@@ -1269,7 +1269,7 @@ function ComplianceListV2({proposals, templates}) {
                                       id="dropdown-basic"
                                       disabled={!aiEnabled}
                                     >
-                                      {selectedTemplate}
+                                      {selectedTemplate.name}
                                     </Dropdown.Toggle>
                                     <Dropdown.Menu style={{width: "100%"}}>
                                       {templates?.map(
