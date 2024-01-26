@@ -71,7 +71,7 @@ function ComplianceListV2({proposals, templates}) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const imageRef = useRef(null);
 
-  const [selectedTemplate, setSelectedTemplate] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState("AI Templates");
   const [aiEnabled, updateAiEnabled] = useState(false);
 
   const { getRootProps, getInputProps, acceptedFiles } = useDropzone({
@@ -181,7 +181,9 @@ function ComplianceListV2({proposals, templates}) {
       formData.append("doc_end", endPage);
       formData.append("loading", "True");
       if(aiEnabled){
-        formData.append("checklist", selectedTemplate);
+        formData.append("checklist", new Blob([JSON.stringify(selectedTemplate)], {
+          type: "application/json"
+        }));
       }
       axiosInstance.defaults.headers["Content-Type"] = "multipart/form-data";
       axiosInstance.defaults.timeout = 2000000; // axiosInstance.timeout = 2000000;
@@ -1253,11 +1255,11 @@ function ComplianceListV2({proposals, templates}) {
                               <hr />
                               <Form.Group className="mb-3 d-flex flex-row justify-content-around w-100 h-100">
                                 <BootstrapSwitchButton
-                                    checked={false}
+                                    checked={aiEnabled}
                                     onlabel='AI'
                                     offlabel='No AI'
                                     width={100}
-                                    onChange={(checked) => {
+                                    onClick={(checked) => {
                                       updateAiEnabled(checked);
                                   }}
                                 />
@@ -1267,7 +1269,7 @@ function ComplianceListV2({proposals, templates}) {
                                       id="dropdown-basic"
                                       disabled={!aiEnabled}
                                     >
-                                      Select a Template
+                                      {selectedTemplate}
                                     </Dropdown.Toggle>
                                     <Dropdown.Menu style={{width: "100%"}}>
                                       {templates?.map(
