@@ -71,7 +71,7 @@ function ComplianceListV2({proposals, templates}) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const imageRef = useRef(null);
 
-  const [selectedTemplate, setSelectedTemplate] = useState("AI Templates");
+  const [selectedTemplate, setSelectedTemplate] = useState({"name": "AI Templates"});
   const [aiEnabled, updateAiEnabled] = useState(false);
 
   const { getRootProps, getInputProps, acceptedFiles } = useDropzone({
@@ -181,7 +181,7 @@ function ComplianceListV2({proposals, templates}) {
       formData.append("doc_end", endPage);
       formData.append("loading", "True");
       if(aiEnabled){
-        formData.append("checklist", new Blob([JSON.stringify(selectedTemplate)], {
+        formData.append("checklist", new Blob([JSON.stringify(selectedTemplate.checklist)], {
           type: "application/json"
         }));
       }
@@ -1278,7 +1278,7 @@ function ComplianceListV2({proposals, templates}) {
                                             <Dropdown.Item
                                               name={item.name}
                                               key={index}
-                                              onClick={() => setSelectedTemplate(item.checklist)}
+                                              onClick={() => setSelectedTemplate(item)}
                                             >
                                               {item.name}
                                             </Dropdown.Item>
