@@ -1255,11 +1255,11 @@ function ComplianceListV2({proposals, templates}) {
                               <hr />
                               <Form.Group className="mb-3 d-flex flex-row justify-content-around w-100 h-100">
                                 <BootstrapSwitchButton
-                                    checked={false}
+                                    checked={aiEnabled}
                                     onlabel='AI'
                                     offlabel='No AI'
                                     width={100}
-                                    onClick={(checked) => {
+                                    onChange={(checked) => {
                                       updateAiEnabled(checked);
                                   }}
                                 />
