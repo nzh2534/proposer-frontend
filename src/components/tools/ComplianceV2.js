@@ -173,7 +173,7 @@ function ComplianceListV2({proposals, templates}) {
     } else if (startPage === false) {
       alert("Please input the PDF's Table of Contents Page");
     } else {
-      console.log(typeof JSON.parse(selectedTemplate.checklist))
+      console.log(selectedTemplate.checklist)
       console.log(typeof JSON.stringify(selectedTemplate.checklist))
       console.log(typeof selectedTemplate.checklist)
       updateRunningTrigger(true);
