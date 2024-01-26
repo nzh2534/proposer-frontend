@@ -173,6 +173,9 @@ function ComplianceListV2({proposals, templates}) {
     } else if (startPage === false) {
       alert("Please input the PDF's Table of Contents Page");
     } else {
+      console.log(typeof JSON.parse(selectedTemplate.checklist))
+      console.log(typeof JSON.stringify(selectedTemplate.checklist))
+      console.log(typeof selectedTemplate.checklist)
       updateRunningTrigger(true);
       let formData = new FormData();
       formData.append("title", proposalData.title);
@@ -181,9 +184,7 @@ function ComplianceListV2({proposals, templates}) {
       formData.append("doc_end", endPage);
       formData.append("loading", "True");
       if(aiEnabled){
-        formData.append("checklist", new Blob([selectedTemplate.checklist], {
-          type: "application/json"
-        }));
+        formData.append("checklist", JSON.stringify(selectedTemplate.checklist))
       }
       axiosInstance.defaults.headers["Content-Type"] = "multipart/form-data";
       axiosInstance.defaults.timeout = 2000000; // axiosInstance.timeout = 2000000;
