@@ -12,6 +12,7 @@ import "./App.css";
 import Logout from "./components/Logout";
 import Delete from "./components/Delete";
 import { ComplianceListV2} from "./components/tools/index";
+import ListViewTemplates from "./components/Template";
 
 function App() {
   const navigate = useNavigate();
@@ -73,6 +74,10 @@ function App() {
           <Route
             path="/proposals/:pk/delete"
             element={<Delete proposals={proposalData.res} />}
+          />
+          <Route
+            path="/templates"
+            element={<ListViewTemplates templates={templateData} />}
           />
         </Routes>
       </div>

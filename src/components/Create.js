@@ -72,7 +72,7 @@ function Create({ proposals }) {
               onChange={handleChange}
             />
           </Form.Group>
-          <Form.Group className="mb-3 form-group">
+          {/* <Form.Group className="mb-3 form-group">
             <Form.Label>Description</Form.Label>
             <Form.Control
               type="textarea"
@@ -111,7 +111,7 @@ function Create({ proposals }) {
               <option value="High">High</option>
               <option value="Critical">Critical</option>
             </Form.Select>
-          </Form.Group>
+          </Form.Group> */}
           <Form.Group className="mb-3 form-group">
             <Form.Label>Assigned</Form.Label>
             <Form.Select

@@ -30,7 +30,8 @@ import {
   faFlag,
   faFileCsv,
   faArrowsUpToLine,
-  faObjectUngroup
+  faObjectUngroup,
+  faRefresh
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -46,6 +47,9 @@ import InputGroup from "react-bootstrap/InputGroup";
 import CsvDownloadButton from "react-json-to-csv";
 import Splitter from "./Splitter";
 import BootstrapSwitchButton from 'bootstrap-switch-button-react';
+import LoadingChecklist from "../LoadingChecklist";
+
+import { useNavigate } from "react-router-dom";
 
 function ComplianceListV2({proposals, templates}) {
   const { pk } = useParams();
@@ -79,6 +83,8 @@ function ComplianceListV2({proposals, templates}) {
   });
   const [startPage, updateStartPage] = useState(false);
   const [endPage, updateEndPage] = useState(false);
+
+  const[merged, setMerged] = useState(false);
 
   const getHierarchy = (title) => {
     const match = title.match(/_(\d+(\.\d+)*)_/);
@@ -146,11 +152,11 @@ function ComplianceListV2({proposals, templates}) {
     data: {},
   });
 
-  const configuration = new Configuration({
-    organization: process.env.REACT_APP_ORG_KEY,
-    apiKey: process.env.REACT_APP_API_AI_KEY,
-  });
-  const openai = new OpenAIApi(configuration);
+  // const configuration = new Configuration({
+  //   organization: process.env.REACT_APP_ORG_KEY,
+  //   apiKey: process.env.REACT_APP_API_AI_KEY,
+  // });
+  // const openai = new OpenAIApi(configuration);
 
   const files = acceptedFiles.map((file) => (
     <li key={file.path}>
@@ -171,7 +177,17 @@ function ComplianceListV2({proposals, templates}) {
     if (acceptedFiles[0] == null) {
       alert("Please input a PDF");
     } else if (startPage === false) {
-      alert("Please input the PDF's Table of Contents Page");
+      alert("Please input a Start page for the PDF document processor");
+    } else if (endPage === false) {
+      alert("Please input an End page for the PDF document processor");
+    } else if (parseInt(startPage) < 1) {
+      alert("Start Page must be greater than 0");
+    } else if (parseInt(endPage) < 1) {
+      alert("End Page must be greater than 0");
+    } else if (parseInt(startPage) >= parseInt(endPage)) {
+      alert("The Start Page must be less than the End Page");
+      console.log(startPage >= endPage);
+      console.log(endPage);
     } else {
       console.log(selectedTemplate.checklist)
       console.log(typeof JSON.stringify(selectedTemplate.checklist))
@@ -234,26 +250,26 @@ function ComplianceListV2({proposals, templates}) {
   //     console.log(e.dataTransfer.getData('name'))
   // }
 
-  const handleDropOutline = async (e) => {
-    var id = e.dataTransfer.getData("name");
-    var specificComplianceItem = complianceData.find((item) => {
-      return item.id === parseInt(id);
-    });
-    var previousData = [...aiData];
-    var prompt = activeAiPrompt + ": ";
-    try {
-      const result = await openai.createCompletion({
-        model: process.env.REACT_APP_MODEL,
-        max_tokens: 1024,
-        prompt: prompt.concat(specificComplianceItem.content_text),
-      });
-      previousData.push(result.data.choices[0].text);
-      updateAiData(previousData);
-    } catch (e) {
-      //console.log(e);
-      console.log(e);
-    }
-  };
+  // const handleDropOutline = async (e) => {
+  //   var id = e.dataTransfer.getData("name");
+  //   var specificComplianceItem = complianceData.find((item) => {
+  //     return item.id === parseInt(id);
+  //   });
+  //   var previousData = [...aiData];
+  //   var prompt = activeAiPrompt + ": ";
+  //   try {
+  //     const result = await openai.createCompletion({
+  //       model: process.env.REACT_APP_MODEL,
+  //       max_tokens: 1024,
+  //       prompt: prompt.concat(specificComplianceItem.content_text),
+  //     });
+  //     previousData.push(result.data.choices[0].text);
+  //     updateAiData(previousData);
+  //   } catch (e) {
+  //     //console.log(e);
+  //     console.log(e);
+  //   }
+  // };
 
   const handleDropSection = async (e) => {
     if (e.dataTransfer.getData("name")) {
@@ -270,7 +286,9 @@ function ComplianceListV2({proposals, templates}) {
         specificComplianceItem.content_text,
         "\n",
       );
-      cklistcopy[objIndex].pages = cklistcopy[objIndex].pages.concat(
+      console.log(cklistcopy[objIndex])
+      console.log(specificComplianceItem.page_number)
+      cklistcopy[objIndex].page = cklistcopy[objIndex].page.concat(
         specificComplianceItem.page_number,
         ", ",
       );
@@ -429,9 +447,12 @@ function ComplianceListV2({proposals, templates}) {
     console.log(imageRef)
   };
 
+  // const navigate = useNavigate();
+
   const handleMerge = (item) => {
     const index = complianceData.findIndex((obj) => obj.id == item.item.id);
     if(index > 0){
+      setMerged(true);
       const parent = complianceData[index -1]
       const child = complianceData[index]
       console.log(parent)
@@ -450,6 +471,8 @@ function ComplianceListV2({proposals, templates}) {
       .then((res) => {
         console.log(res);
         refreshPage();
+        setMerged(false);
+        window.location.reload();
       })
     } else {
       alert("Can only merge when there is a section prior to the selected section")
@@ -556,7 +579,7 @@ function ComplianceListV2({proposals, templates}) {
   const handleAddToChecklist = () => {
     var checklistCopy = [...checklistData];
     var maxId = Math.max(...checklistCopy.map((o) => o.id));
-    checklistCopy.push({ item: "", id: maxId + 1, data: "", pages: "" });
+    checklistCopy.push({ item: "", id: maxId + 1, data: "", page: "" });
     updateChecklistData(checklistCopy);
   };
 
@@ -1139,6 +1162,7 @@ function ComplianceListV2({proposals, templates}) {
                                   className="overflow-auto"
                                   style={{ maxHeight: "125vh" }}
                                 >
+                                  { merged ? <Loading /> :
                                   <Tab.Content>
                                     {complianceData?.map((item, index) => {
                                       return (
@@ -1185,6 +1209,7 @@ function ComplianceListV2({proposals, templates}) {
                                       );
                                     })}
                                   </Tab.Content>
+                                  }
                                 </Col>
                             </Row>
                           </Tab.Container>
@@ -1286,6 +1311,13 @@ function ComplianceListV2({proposals, templates}) {
                                           );
                                         },
                                       )}
+                                      <Dropdown.Item
+                                              name="templates"
+                                              href="/templates/"
+                                              style={{backgroundColor: "#66ab57"}}
+                                            >
+                                              Add/Edit <FontAwesomeIcon size="xl" icon={faPlus} />
+                                      </Dropdown.Item>
                                     </Dropdown.Menu>
                                   </Dropdown>
                               </Form.Group>
@@ -1531,41 +1563,74 @@ function ComplianceListV2({proposals, templates}) {
                       sm={8}
                       className="d-flex justify-content-center overflow-scroll"
                       style={{ maxHeight: "125vh" }}
-                    >
+                    > {proposalData.loading_checklist ? <LoadingChecklist pk={pk} refresh={refreshPage} loading_checklist={proposalData.loading_checklist}/> :
                       <Form style={{ width: "100%" }}>
-                        <Button
-                          style={{ marginBottom: "1vh"}}
-                          onClick={() => handleAddToChecklist()}
-                        >
-                          <FontAwesomeIcon
-                            size="sm"
-                            icon={faPlus}
-                          />
-                        </Button>
-                        <Button
-                          style={{
-                            marginBottom: "1vh",
-                            marginLeft: "1vh",
-                            marginRight: "1vh",
-                          }}
-                          onClick={() => handleSaveChecklist()}
-                        >
-                          <FontAwesomeIcon
-                            size="sm"
-                            icon={faFloppyDisk}
-                          />
-                        </Button>
-                        <CsvDownloadButton
-                          style={{ marginBottom: "1vh" }}
-                          className="btn btn-primary"
-                          data={checklistData}
-                          delimiter=","
-                        >
-                          <FontAwesomeIcon
-                            size="sm"
-                            icon={faFileCsv}
-                          />
-                        </CsvDownloadButton>
+                        <OverlayTrigger
+                            placement="bottom"
+                            delay={{ show: 1000, hide: 50 }}
+                            overlay={
+                              <Popover style={{backgroundColor: "#66ab57", zoom:"74%"}} className="custom-pover">
+                                <Popover.Body style={{backgroundColor: "white"}} className="custom-pover-body">
+                                  <div>Add new row to checklist</div>
+                                </Popover.Body>
+                              </Popover>
+                            }>
+                              <Button
+                                style={{ marginBottom: "1vh"}}
+                                onClick={() => handleAddToChecklist()}
+                              >
+                                <FontAwesomeIcon
+                                  size="sm"
+                                  icon={faPlus}
+                                />
+                              </Button>
+                          </OverlayTrigger>
+                          <OverlayTrigger
+                            placement="bottom"
+                            delay={{ show: 1000, hide: 50 }}
+                            overlay={
+                              <Popover style={{backgroundColor: "#66ab57", zoom:"74%"}} className="custom-pover">
+                                <Popover.Body style={{backgroundColor: "white"}} className="custom-pover-body">
+                                  <div>Save checklist</div>
+                                </Popover.Body>
+                              </Popover>
+                            }>
+                              <Button
+                                style={{
+                                  marginBottom: "1vh",
+                                  marginLeft: "1vh",
+                                  marginRight: "1vh",
+                                }}
+                                onClick={() => handleSaveChecklist()}
+                              >
+                                <FontAwesomeIcon
+                                  size="sm"
+                                  icon={faFloppyDisk}
+                                />
+                              </Button>
+                          </OverlayTrigger>
+                              <CsvDownloadButton
+                                style={{ marginBottom: "1vh" }}
+                                className="btn btn-primary"
+                                data={checklistData}
+                                delimiter=","
+                              >
+                                <OverlayTrigger
+                            placement="bottom"
+                            delay={{ show: 1000, hide: 50 }}
+                            overlay={
+                              <Popover style={{backgroundColor: "#66ab57", zoom:"74%"}} className="custom-pover">
+                                <Popover.Body style={{backgroundColor: "white"}} className="custom-pover-body">
+                                  <div>Export checklist to Excel</div>
+                                </Popover.Body>
+                              </Popover>
+                            }>
+                                <FontAwesomeIcon
+                                  size="sm"
+                                  icon={faFileCsv}
+                                />
+                              </OverlayTrigger>
+                              </CsvDownloadButton>
                         <Table striped bordered hover>
                           <thead>
                             <tr>
@@ -1589,7 +1654,7 @@ function ComplianceListV2({proposals, templates}) {
                                         .toString()
                                         .concat("_pages")}
                                       as="textarea"
-                                      value={item.pages}
+                                      value={item.page?.toString()}
                                       onChange={(e) =>
                                         handleChecklistChange(e)
                                       }
@@ -1647,11 +1712,12 @@ function ComplianceListV2({proposals, templates}) {
                           </tbody>
                         </Table>
                       </Form>
+                      }
                     </Col>
                   </Row>
                 </Tab.Pane>
                 <Tab.Pane eventKey="#link3">
-                  <Outline textArray={aiData} proposalData={proposalData} />
+                  <Outline checklistData={checklistData} proposalData={proposalData} />
                 </Tab.Pane>
               </Tab.Content>
             </Col>

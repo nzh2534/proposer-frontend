@@ -7,10 +7,11 @@ import { useEffect, useState } from "react";
 import { gapi } from "gapi-script";
 import axiosInstance from "../../axios";
 import GoogleButton from "react-google-button";
+import { OverlayTrigger, Popover } from "react-bootstrap";
 
 const API_KEY = process.env.REACT_APP_API_GOOGLE_KEY;
 
-function Outline({ textArray, proposalData }) {
+function Outline({ checklistData, proposalData }) {
   var testHeader = " ";
   var instructionText =
     "\n\nINSTRUCTIONS FOR THIS DOCUMENT:\n(1) All highlighted text should eventually be deleted\n";
@@ -100,6 +101,8 @@ function Outline({ textArray, proposalData }) {
       path: process.env.REACT_APP_TEMPLATE_PATH,
       method: "POST",
     });
+
+    console.log(request)
 
     request.execute(function (resp) {
       updateDocumentId(resp.id);
@@ -281,7 +284,7 @@ function Outline({ textArray, proposalData }) {
         contentsArr.forEach((index) => {
           newRequests.push({
             insertText: {
-              text: "\n" + textArray[index - 1],
+              text: "\n" + checklistData[index - 1].data,
               location: {
                 index: documentIndex,
               },
@@ -352,6 +355,8 @@ function Outline({ textArray, proposalData }) {
   const handleDropContent = (e) => {
     const content = e.dataTransfer.getData("name");
     const id = parseInt(e.dataTransfer.getData("id")) + 1;
+    console.log(content);
+    console.log(id);
     let previousContent = { ...outlineContent };
     console.log(id); //which item in list
     console.log(e.target.name.split("_")[0]); //which section
@@ -368,9 +373,8 @@ function Outline({ textArray, proposalData }) {
   return (
     <Row>
       <Col
-        sm={2}
-        className="vh-100 overflow-auto d-flex align-items-center justify-content-center"
-        style={{ borderRight: "5px solid gray" }}
+        sm={4}
+        className="overflow-auto d-flex align-items-center justify-content-center"
       >
         {googleLoggedIn ? (
           <div className="vh-100 d-flex flex-column">
@@ -394,7 +398,7 @@ function Outline({ textArray, proposalData }) {
                           <Form.Control
                             type="number"
                             name="sections"
-                            placeholder="Enter number of sections (integers only)"
+                            placeholder="Enter number of sections"
                           />
                         </Form.Group>
                         <Button variant="primary" type="submit">
@@ -421,15 +425,27 @@ function Outline({ textArray, proposalData }) {
                                 name={`${item}_pages`}
                                 placeholder={`Enter Page #${item}`}
                               />
-                              <Form.Control
+                              <OverlayTrigger
+                                placement="right"
+                                delay={{ show: 200, hide: 50 }}
+                                overlay={
+                                  <Popover style={{backgroundColor: "#66ab57"}} className="custom-pover">
+                                    <Popover.Body style={{backgroundColor: "white"}} className="custom-pover-body">
+                                      <div>Drag and Drop the sections to the right over this area to include in the document outline. Add more sections to the right by updating and saving the checklist in the Checklist tab.</div>
+                                    </Popover.Body>
+                                  </Popover>
+                                }>
+                                  <Form.Control
                                 disabled
                                 onDragOver={(e) => handleAllowDrop(e)}
                                 onDrop={(e) => handleDropContent(e)}
                                 name={`${item}_content`}
-                                placeholder={Object.keys(
+                                placeholder="No Content Specified"
+                                value={Object.keys(
                                   outlineContent[item],
                                 ).toString()}
                               />
+                              </OverlayTrigger>
                             </Form.Group>
                           );
                         })}
@@ -462,29 +478,33 @@ function Outline({ textArray, proposalData }) {
         )}
       </Col>
       {documentLink.length === 0 ? (
-        <Col sm={10} className="vh-100 overflow-auto">
-          {textArray.map((item, index) => {
-            return (
+        <Col sm={8} className="overflow-auto" style={{height: "130vh", zoom:"67%"}}>
+          {checklistData.length === 0 ? <div>Text Data Added to the Checklist Tab will Appear here</div>: <>{checklistData.map((item, index) => {
+            return (<>{ (item.data.length > 0) ?
               <ListGroup className="m-2" key={index}>
                 <ListGroup.Item
                   action
-                  name={item}
+                  name={item.id}
                   id={index}
                   href={`#link${index}`}
                   draggable="true"
                   onDragStart={(e) => handleDrag(e)}
                 >
-                  <div>{index + 1}</div>
-                  {item}
+                  <div style={{fontWeight: "bold"}}>{`(${index + 1}) ${item.item}`}`</div>
+                  {item.data} 
                 </ListGroup.Item>
               </ListGroup>
-            );
-          })}
+              :
+              <></>
+            }</>);
+          })}</>}
         </Col>
       ) : (
-        <Col sm={10} className="vh-100 overflow-auto">
+        <Col sm={8} className="vh-100 overflow-auto mt-1">
+          <div>
           Your Google Document Has Been Created (Click to Link Button on the
           Left)
+          </div>
         </Col>
       )}
     </Row>

@@ -22,7 +22,8 @@ function LoadingBar({pk, refresh}) {
               updateloadingProgress(loadingUpdate)
               updateLabel(`Processing Page ${data.pages_ran + 1} of ${(data.doc_end - data.doc_start)}`)
             } else if (data.pages_ran == (data.doc_end - data.doc_start) ) {
-              updateLabel('Saving')
+              updateloadingProgress(100);
+              updateLabel('Saving');
             } else {
               console.log("not loading")
               axiosInstance
@@ -43,7 +44,7 @@ function LoadingBar({pk, refresh}) {
           });
       };
 
-      const startInterval = setInterval(refreshProposal, 20000);
+      const startInterval = setInterval(refreshProposal, 30000);
       useEffect(refreshProposal,[]);
 
 
