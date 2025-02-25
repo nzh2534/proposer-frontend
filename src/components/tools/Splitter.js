@@ -1,9 +1,19 @@
 import React, { useState, useRef } from 'react';
 import axiosInstance from '../../axios';
 import Button from "react-bootstrap/Button";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Popover from "react-bootstrap/Popover";
 import Loading from '../Loading';
+import {
+  faArrowLeft,
+  faRefresh,
+  faObjectUngroup
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-const Splitter = ({item, alt, refresh}) => {
+const Splitter = ({item, refresh, updateSplitMode}) => {
   const [boxes, setBoxes] = useState([]);
   const [drawing, setDrawing] = useState(false);
   const [boxId, setBoxId] = useState(1);
@@ -46,6 +56,9 @@ const Splitter = ({item, alt, refresh}) => {
   };
 
   const handleLogCoordinates = (e) => {
+    if (boxes.length == 0){
+      alert("Place boxes over the image to split")
+    } else{
     e.preventDefault();
     setLoading(true);
     let formData = new FormData();
@@ -53,6 +66,7 @@ const Splitter = ({item, alt, refresh}) => {
     formData.append("baseId", getHierarchy(item.title).concat(".1"));
     formData.append("id", item.id);
     formData.append("proposal", item.proposal);
+    formData.append("process", "split")
     axiosInstance
     .post(`proposals/${item.proposal}/compliance/`, formData, {headers: { 'Content-Type': 'multipart/form-data'}})
     .catch((error) => {
@@ -63,15 +77,52 @@ const Splitter = ({item, alt, refresh}) => {
       refresh();
       setLoading(false);
       setBoxes([]);
-    })
+    })}
   };
 
   return (<>{ loading ? <Loading /> :
-    <div style={{backgroundColor: "gray"}}>
-      <div>
-        <Button onClick={()=>{setBoxes([]); setBoxId(0)}}>Reset Boxes</Button>
-        <Button style={{marginLeft: "5vw"}} onClick={handleLogCoordinates}>Split</Button>
-      </div>
+    <div>
+      <Row className='p-1'>
+        <Col>
+        <OverlayTrigger
+          placement="left"
+          delay={{ show: 1000, hide: 50 }}
+          overlay={
+            <Popover style={{backgroundColor: "#66ab57"}} className="custom-pover">
+              <Popover.Body style={{backgroundColor: "white"}} className="custom-pover-body">
+                <div>Go back</div>
+              </Popover.Body>
+            </Popover>
+          }>
+          <Button><FontAwesomeIcon size="xl" onClick={() => {updateSplitMode({"set": false, "itemRef": {}})}} icon={faArrowLeft} /></Button>
+        </OverlayTrigger>
+        <OverlayTrigger
+          placement="bottom"
+          delay={{ show: 1000, hide: 50 }}
+          style={{zoom: "67%"}}
+          overlay={
+            <Popover style={{backgroundColor: "#66ab57"}} className="custom-pover">
+              <Popover.Body style={{backgroundColor: "white"}} className="custom-pover-body">
+                <div>Click to split this section based on the boxes placed over the image</div>
+              </Popover.Body>
+            </Popover>
+          }>
+            <Button style={{marginLeft: "1vw"}} onClick={handleLogCoordinates}><FontAwesomeIcon size="xl" icon={faObjectUngroup} /></Button>
+          </OverlayTrigger>
+          <OverlayTrigger
+          placement="right"
+          delay={{ show: 1000, hide: 50 }}
+          overlay={
+            <Popover style={{backgroundColor: "#66ab57"}} className="custom-pover">
+              <Popover.Body style={{backgroundColor: "white"}} className="custom-pover-body">
+                <div>Click to remove any boxes placed over the image</div>
+              </Popover.Body>
+            </Popover>
+          }>
+            <Button style={{marginLeft: "1vw"}} onClick={()=>{setBoxes([]); setBoxId(0)}}><FontAwesomeIcon size="xl" icon={faRefresh} /></Button>
+          </OverlayTrigger>
+        </Col>
+      </Row>
       <div
         style={{ position: 'relative', display: 'inline-block' }}
         onMouseDown={handleMouseDown}
@@ -80,15 +131,14 @@ const Splitter = ({item, alt, refresh}) => {
         <img
           ref={imageRef}
           src={item.content}
-          alt={alt}
-          style={{ cursor: "crosshair"}}
+          style={{ cursor: "crosshair", border: "10px solid #66ab57", borderRadius: "15px"}}
         />
 
         {drawing && (
           <div
             style={{
               position: 'absolute',
-              border: '2px dashed red',
+              border: '2px dashed #66ab57',
               pointerEvents: 'none',
               left: startCoords.x,
               top: startCoords.y,
@@ -103,7 +153,7 @@ const Splitter = ({item, alt, refresh}) => {
             key={index}
             style={{
               position: 'absolute',
-              border: '2px dashed blue',
+              border: '2px dashed #708090',
               left: box.start.x,
               top: box.start.y,
               width: box.end.x - box.start.x,

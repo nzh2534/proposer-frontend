@@ -13,7 +13,7 @@ function CollapsibleNavbar({ count }) {
       expand="lg"
       bg="dark"
       variant="dark"
-      style={{ width: "100%" }}
+      style={{zoom: "67%"}}
     >
       <Container className="ms-0 w-auto">
         <Navbar.Brand href="/">
@@ -28,7 +28,7 @@ function CollapsibleNavbar({ count }) {
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link href="/dashboard">Dashboard</Nav.Link>
+            {/* <Nav.Link href="/dashboard">Dashboard</Nav.Link> */}
             <Nav.Link href="/proposals">
               Proposals{" "}
               {count?.length > 0 ? (

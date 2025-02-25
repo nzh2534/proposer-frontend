@@ -12,7 +12,9 @@ function Proposal(props) {
 function ListView({ proposals }) {
   return (
     <ListGroup defaultActiveKey="#">
-      {proposals?.map((item, index) => {
+      {proposals?.filter((obj) =>{
+        return obj.assigned == localStorage.getItem("username")
+      }).map((item, index) => {
         return <Proposal proposal={item} key={index} />;
       })}
     </ListGroup>

@@ -9,6 +9,7 @@ import Button from "react-bootstrap/Button";
 import React, { useEffect, useState, useRef } from "react";
 import axiosInstance from "../../axios";
 import Loading from "../Loading";
+import LoadingBar from "../LoadingBar";
 import Dropdown from "react-bootstrap/Dropdown";
 
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
@@ -28,6 +29,9 @@ import {
   faClockRotateLeft,
   faFlag,
   faFileCsv,
+  faArrowsUpToLine,
+  faObjectUngroup,
+  faRefresh
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -42,13 +46,20 @@ import Table from "react-bootstrap/Table";
 import InputGroup from "react-bootstrap/InputGroup";
 import CsvDownloadButton from "react-json-to-csv";
 import Splitter from "./Splitter";
+import BootstrapSwitchButton from 'bootstrap-switch-button-react';
+import LoadingChecklist from "../LoadingChecklist";
 
-function ComplianceListV2() {
+import { useNavigate } from "react-router-dom";
+
+function ComplianceListV2({proposals, templates}) {
   const { pk } = useParams();
   const [editMode, updateEditMode] = useState(false);
   const [proposalData, updateProposalData] = useState(false);
   const [complianceData, updateComplianceData] = useState();
-  const [imageMode, updateImageMode] = useState(false);
+  const [splitMode, updateSplitMode] = useState({
+    "set": false,
+    "itemRef": {}
+  });
   const [sectionData, updateSectionData] = useState();
   const [activeSectionData, updateActiveSectionData] =
     useState("Section Filters");
@@ -62,18 +73,26 @@ function ComplianceListV2() {
   const [searchInput, updateSearchInput] = useState("");
   const [complianceDataOriginal, updateComplianceDataOriginal] = useState();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const imageRef = useRef(null);
+
+  const [selectedTemplate, setSelectedTemplate] = useState({"name": "AI Templates"});
+  const [aiEnabled, updateAiEnabled] = useState(false);
 
   const { getRootProps, getInputProps, acceptedFiles } = useDropzone({
     maxFiles: 1,
   });
-  const [tocPage, updateTocPage] = useState(false);
+  const [startPage, updateStartPage] = useState(false);
+  const [endPage, updateEndPage] = useState(false);
+
+  const[merged, setMerged] = useState(false);
+
+  const getHierarchy = (title) => {
+    const match = title.match(/_(\d+(\.\d+)*)_/);
+    return match ? match[1] : '';
+  };
 
   function sortByHierarchy(objects) {
     return objects.sort((a, b) => {
-      const getHierarchy = (title) => {
-        const match = title.match(/_(\d+(\.\d+)*)_/);
-        return match ? match[1] : '';
-      };
   
       const hierarchyA = getHierarchy(a.title);
       const hierarchyB = getHierarchy(b.title);
@@ -109,8 +128,8 @@ function ComplianceListV2() {
         updateComplianceDataOriginal(sortByHierarchy(resDataCopy.complianceimages_set));
         updateSectionData(resDataCopy.compliance_sections);
         updateChecklistData(resDataCopy.checklist);
-        console.log(res);
-        console.log(resDataCopy);
+        updateRunningTrigger(resDataCopy.loading);
+        updateSplitMode({"set": false, "itemRef": {}});
       });
   };
 
@@ -133,51 +152,69 @@ function ComplianceListV2() {
     data: {},
   });
 
-  const configuration = new Configuration({
-    organization: process.env.REACT_APP_ORG_KEY,
-    apiKey: process.env.REACT_APP_API_AI_KEY,
-  });
-  const openai = new OpenAIApi(configuration);
+  // const configuration = new Configuration({
+  //   organization: process.env.REACT_APP_ORG_KEY,
+  //   apiKey: process.env.REACT_APP_API_AI_KEY,
+  // });
+  // const openai = new OpenAIApi(configuration);
 
   const files = acceptedFiles.map((file) => (
     <li key={file.path}>
-      {file.path} - {file.size} - {file.type}bytes
+      {file.path} - {file.size} - {file.type} bytes
     </li>
   ));
 
-  const handleUpdateTocPage = (e) => {
-    updateTocPage(e.target.value);
+  const handleUpdateStartPage = (e) => {
+    updateStartPage(e.target.value);
+  };
+
+  const handleUpdateEndPage = (e) => {
+    updateEndPage(e.target.value);
   };
 
   const handleSubmitNofo = (e) => {
     e.preventDefault();
     if (acceptedFiles[0] == null) {
       alert("Please input a PDF");
-    } else if (tocPage === false) {
-      alert("Please input the PDF's Table of Contents Page");
+    } else if (startPage === false) {
+      alert("Please input a Start page for the PDF document processor");
+    } else if (endPage === false) {
+      alert("Please input an End page for the PDF document processor");
+    } else if (parseInt(startPage) < 1) {
+      alert("Start Page must be greater than 0");
+    } else if (parseInt(endPage) < 1) {
+      alert("End Page must be greater than 0");
+    } else if (parseInt(startPage) >= parseInt(endPage)) {
+      alert("The Start Page must be less than the End Page");
+      console.log(startPage >= endPage);
+      console.log(endPage);
     } else {
+      console.log(selectedTemplate.checklist)
+      console.log(typeof JSON.stringify(selectedTemplate.checklist))
+      console.log(typeof selectedTemplate.checklist)
+      updateRunningTrigger(true);
       let formData = new FormData();
       formData.append("title", proposalData.title);
       formData.append("nofo", acceptedFiles[0]);
-      formData.append("toc", tocPage);
+      formData.append("doc_start", startPage);
+      formData.append("doc_end", endPage);
+      formData.append("loading", "True");
+      if(aiEnabled){
+        formData.append("checklist", JSON.stringify(selectedTemplate.checklist))
+      }
       axiosInstance.defaults.headers["Content-Type"] = "multipart/form-data";
       axiosInstance.defaults.timeout = 2000000; // axiosInstance.timeout = 2000000;
-      updateRunningTrigger(true);
       axiosInstance
         .put(`proposals/${pk}/update/`, formData)
         .catch((error) => {
           axiosInstance.defaults.headers["Content-Type"] = "application/json";
           axiosInstance.defaults.timeout = 30000;
-          console.log(error.response);
+          console.log(error);
         })
         .then((res) => {
           axiosInstance.defaults.headers["Content-Type"] = "application/json";
           axiosInstance.defaults.timeout = 30000;
-          if (res.status === 200) {
-            console.log(res.data);
-            updateProposalData(res.data);
-            updateRunningTrigger(false);
-          }
+          console.log(res);
         });
     }
   };
@@ -213,26 +250,26 @@ function ComplianceListV2() {
   //     console.log(e.dataTransfer.getData('name'))
   // }
 
-  const handleDropOutline = async (e) => {
-    var id = e.dataTransfer.getData("name");
-    var specificComplianceItem = complianceData.find((item) => {
-      return item.id === parseInt(id);
-    });
-    var previousData = [...aiData];
-    var prompt = activeAiPrompt + ": ";
-    try {
-      const result = await openai.createCompletion({
-        model: process.env.REACT_APP_MODEL,
-        max_tokens: 1024,
-        prompt: prompt.concat(specificComplianceItem.content_text),
-      });
-      previousData.push(result.data.choices[0].text);
-      updateAiData(previousData);
-    } catch (e) {
-      //console.log(e);
-      console.log(e);
-    }
-  };
+  // const handleDropOutline = async (e) => {
+  //   var id = e.dataTransfer.getData("name");
+  //   var specificComplianceItem = complianceData.find((item) => {
+  //     return item.id === parseInt(id);
+  //   });
+  //   var previousData = [...aiData];
+  //   var prompt = activeAiPrompt + ": ";
+  //   try {
+  //     const result = await openai.createCompletion({
+  //       model: process.env.REACT_APP_MODEL,
+  //       max_tokens: 1024,
+  //       prompt: prompt.concat(specificComplianceItem.content_text),
+  //     });
+  //     previousData.push(result.data.choices[0].text);
+  //     updateAiData(previousData);
+  //   } catch (e) {
+  //     //console.log(e);
+  //     console.log(e);
+  //   }
+  // };
 
   const handleDropSection = async (e) => {
     if (e.dataTransfer.getData("name")) {
@@ -249,7 +286,9 @@ function ComplianceListV2() {
         specificComplianceItem.content_text,
         "\n",
       );
-      cklistcopy[objIndex].pages = cklistcopy[objIndex].pages.concat(
+      console.log(cklistcopy[objIndex])
+      console.log(specificComplianceItem.page_number)
+      cklistcopy[objIndex].page = cklistcopy[objIndex].page.concat(
         specificComplianceItem.page_number,
         ", ",
       );
@@ -403,9 +442,43 @@ function ComplianceListV2() {
     }
   };
 
-  const handleImageMode = (e) => {
-    updateImageMode(e);
+  const handleSplitMode = (e) => {
+    updateSplitMode(e);
+    console.log(imageRef)
   };
+
+  // const navigate = useNavigate();
+
+  const handleMerge = (item) => {
+    const index = complianceData.findIndex((obj) => obj.id == item.item.id);
+    if(index > 0){
+      setMerged(true);
+      const parent = complianceData[index -1]
+      const child = complianceData[index]
+      console.log(parent)
+      console.log(child)
+      let formData = new FormData();
+      formData.append("proposal", parent.proposal);
+      formData.append("parent_id", parent.id);
+      formData.append("id", child.id);
+      formData.append("hierarchy", getHierarchy(parent.content));
+      formData.append("process", "merge")
+      axiosInstance
+      .post(`proposals/${pk}/compliance/`, formData, {headers: { 'Content-Type': 'multipart/form-data'}})
+      .catch((error) => {
+        console.log(error.response);
+      })
+      .then((res) => {
+        console.log(res);
+        refreshPage();
+        setMerged(false);
+        window.location.reload();
+      })
+    } else {
+      alert("Can only merge when there is a section prior to the selected section")
+    }
+  }
+
 
   // const handleChangeNewPrompt = (e) => {
   //   var addingPromptCopy = addingPrompt;
@@ -506,7 +579,7 @@ function ComplianceListV2() {
   const handleAddToChecklist = () => {
     var checklistCopy = [...checklistData];
     var maxId = Math.max(...checklistCopy.map((o) => o.id));
-    checklistCopy.push({ item: "", id: maxId + 1, data: "", pages: "" });
+    checklistCopy.push({ item: "", id: maxId + 1, data: "", page: "" });
     updateChecklistData(checklistCopy);
   };
 
@@ -557,19 +630,18 @@ function ComplianceListV2() {
     <>
       {proposalData ? (
         <Tab.Container
-          className="h-100vh"
           id="list-group-tabs"
           defaultActiveKey="#link1"
         >
           <Row>
             <Col
-              className="d-flex justify-content-start bg-dark h-100% flex-column align-content-center"
+              className="d-flex justify-content-start bg-dark flex-column align-content-center"
               lg={2}
-              style={{ minHeight: "100vh", height: "auto" }}
+              style={{zoom: "74%", height: "150vh"}}
             >
-              <ListGroup>
+              <ListGroup style={{ marginLeft: "1vw"}}>
                 <ListGroup.Item>
-                  <Container style={{ width: "166px" }}>
+                  <Container>
                     <Container>
                       <TextAreaAutoSize
                         className="titleInputTextArea"
@@ -618,10 +690,10 @@ function ComplianceListV2() {
                 )}
               </ListGroup>
               <hr />
-              <ListGroup>
+              <ListGroup style={{ marginLeft: "1vw"}}>
                 <ListGroup.Item>
                   <Button
-                    style={{ backgroundColor: "#f44336", color: "white" }}
+                    style={{ backgroundColor: "#f44336", color: "white"}}
                     onClick={() => setShowDeleteModal(true)}
                   >
                     Delete
@@ -638,7 +710,7 @@ function ComplianceListV2() {
               <Tab.Content className="h-100vh">
                 <Tab.Pane eventKey="#link1">
                   {proposalData ? (
-                    proposalData.nofo ? (
+                    (proposalData.nofo && proposalData.complianceimages_set.length > 0) ? (
                       focusData.focusing ? (
                         //focusing
                         <Form onSubmit={(e) => handleSubmitCompliance(e)}>
@@ -709,7 +781,7 @@ function ComplianceListV2() {
                             </Tab>
                           </Tabs>
                         </Form>
-                      ) : (
+                      ) : ( splitMode.set ? <Splitter item={splitMode.itemRef} refresh={refreshPage} updateSplitMode={updateSplitMode}/> :
                         //viewing
                         <>
                             {/* <Col
@@ -838,11 +910,11 @@ function ComplianceListV2() {
                             id="list-group-tabs"
                             defaultActiveKey="#link1"
                           >
-                            <Row style={{marginTop: "1vh"}}>
+                            <Row style={{marginTop: "1vh", zoom: "74%"}}>
                               <Col
                                 sm={4}
-                                className="vh-100 overflow-auto"
-                                style={{ maxHeight: "90vh" }}
+                                className="overflow-auto"
+                                style={{ maxHeight: "125vh" }}
                               >
                                 <ListGroup>
                                   <InputGroup className="mb-1">
@@ -999,13 +1071,13 @@ function ComplianceListV2() {
                                       <OverlayTrigger
                                         placement="right"
                                         key={index}
-                                        delay={{ show: 250, hide: 400 }}
+                                        delay={{ show: 400, hide: 100 }}
                                         overlay={
-                                          <Popover className="custom-pover">
+                                          <Popover className="custom-pover" style={{zoom: "74%"}}>
                                             <Popover.Header
                                               as="h3"
                                               className="custom-pover-header"
-                                            >{`Page #${item.page_number} (Double Click to Edit)`}</Popover.Header>
+                                            >{`Page #${item.page_number} (Double Click for Text Editor)`}</Popover.Header>
                                             <Popover.Body className="custom-pover-body">
                                               <div>{item.title_text}</div>
                                             </Popover.Body>
@@ -1087,44 +1159,57 @@ function ComplianceListV2() {
                               </Col>
                                 <Col
                                   sm={8}
-                                  className="vh-100 overflow-auto"
-                                  style={{ maxHeight: "90vh" }}
+                                  className="overflow-auto"
+                                  style={{ maxHeight: "125vh" }}
                                 >
+                                  { merged ? <Loading /> :
                                   <Tab.Content>
                                     {complianceData?.map((item, index) => {
                                       return (
-                                        <>
-                                          {imageMode ? (
                                             <Tab.Pane
                                               key={index}
                                               eventKey={`#link${index}`}
-                                              // onClick={() =>
-                                              //   handleImageMode(false)
-                                              // }
                                             >
-                                              {/* <img
+                                              <Col>
+                                              <Row style={{marginBottom: "4vh", borderBottom: "5px solid #708090"}}>
+                                                <Col className="d-flex flex-row justify-content-center mb-3">
+                                                  <OverlayTrigger
+                                                    placement="bottom"
+                                                    delay={{ show: 1000, hide: 50 }}
+                                                    overlay={
+                                                      <Popover style={{backgroundColor: "#66ab57", zoom: "74%"}} className="custom-pover">
+                                                        <Popover.Body style={{backgroundColor: "white"}} className="custom-pover-body">
+                                                          <div>Merge Image</div>
+                                                        </Popover.Body>
+                                                      </Popover>
+                                                    }>
+                                                    <Button><FontAwesomeIcon size="xl" onClick={() => handleMerge({item})} icon={faArrowsUpToLine} /></Button>
+                                                  </OverlayTrigger>
+                                                  <OverlayTrigger
+                                                    placement="bottom"
+                                                    delay={{ show: 1000, hide: 50 }}
+                                                    overlay={
+                                                      <Popover style={{backgroundColor: "#66ab57", zoom: "74%"}} className="custom-pover">
+                                                        <Popover.Body style={{backgroundColor: "white"}} className="custom-pover-body">
+                                                          <div>Split Image</div>
+                                                        </Popover.Body>
+                                                      </Popover>
+                                                    }>
+                                                    <Button style={{marginLeft: "2vw", marginRight: "4vw"}} onClick={() =>handleSplitMode({"set": true, "itemRef": item})}><FontAwesomeIcon size="xl" icon={faObjectUngroup} /></Button>
+                                                  </OverlayTrigger>
+                                                </Col>
+                                              </Row>
+                                              <img
+                                                ref={imageRef}
                                                 src={item.content}
                                                 alt={index}
-                                                width="500"
-                                                height="auto"
-                                              /> */}
-                                              <Splitter item={item} alt={index} refresh={refreshPage}/>
+                                              />
+                                              </Col>
                                             </Tab.Pane>
-                                          ) : (
-                                            <Tab.Pane
-                                              key={index}
-                                              eventKey={`#link${index}`}
-                                              onClick={() =>
-                                                handleImageMode(true)
-                                              }
-                                            >
-                                              {item.content_text}
-                                            </Tab.Pane>
-                                          )}
-                                        </>
                                       );
                                     })}
                                   </Tab.Content>
+                                  }
                                 </Col>
                             </Row>
                           </Tab.Container>
@@ -1132,65 +1217,127 @@ function ComplianceListV2() {
                       )
                     ) : //Loading
                     runningTrigger ? (
-                      <Container>
-                        Leave this page run in the background (~15 minutes for a
-                        50 page document and ~30 minutes for a 100 page
-                        document)
-                        <Loading />
+                      <Container style={{height: "100vh", width: "auto"}} className="d-flex justify-content-center align-items-center">
+                        <LoadingBar pk={pk} refresh={refreshPage}/>
                       </Container>
                     ) : (
                       //Initial NOFO Input
-                      <Col
-                        className="d-flex justify-content-center align-items-center"
-                        style={{ height: "80vh", flexDirection: "column" }}
-                      >
-                        <div
+                        <Form
                           style={{
-                            marginTop: "10px",
-                            marginBottom: "10px",
-                            width: "50%",
+                            marginRight: "100px",
+                            marginLeft: "100px",
+                            marginTop: "5vh",
                           }}
-                          {...getRootProps({ className: "dropzone" })}
                         >
-                          <input
-                            className="input-zone"
-                            name="nofo"
-                            {...getInputProps()}
-                          />
-                          <div className="text-center">
-                            <p className="dropzone-content">
-                              {acceptedFiles[0]
-                                ? files
-                                : "Add your PDF NOFO Here"}
-                            </p>
-                          </div>
-                        </div>
-                        <Form.Control
-                          type="number"
-                          name="toc#"
-                          placeholder="Enter the Table of Contents Page #"
-                          style={{ marginBottom: "10px", width: "35%" }}
-                          onChange={(e) => handleUpdateTocPage(e)}
-                        />
-                        <Button
-                          variant="primary"
-                          type="submit"
-                          onClick={handleSubmitNofo}
-                        >
-                          Submit
-                        </Button>
-                      </Col>
+                          <Row className="d-flex align-items-center justify-content-center">
+                            <Col
+                              style={{
+                                maxWidth: "500px",
+                                backgroundColor: "hsl(1,0%,90%)",
+                                padding: "20px",
+                                borderRadius: "7px",
+                                margin: "10px",
+                              }}
+                            >
+                              <Form.Label style={{ fontSize: "20px" }}>
+                                PDF Document Processor
+                              </Form.Label>
+                              <hr />
+                              <Form.Group className="mb-3 form-group">
+                                <div
+                                  {...getRootProps({ className: "dropzone" })}
+                                >
+                                  <input
+                                    className="input-zone"
+                                    name="nofo"
+                                    {...getInputProps()}
+                                  />
+                                  <div className="text-center">
+                                    <p className="dropzone-content">
+                                      {acceptedFiles[0]
+                                        ? files
+                                        : "Add your PDF Here"}
+                                    </p>
+                                  </div>
+                                </div>
+                              </Form.Group>
+                              <hr />
+                              <Form.Group className="mb-3 d-flex flex-row justify-content-center">
+                                <Form.Control
+                                  type="number"
+                                  name="start#"
+                                  placeholder="Start Page"
+                                  style={{marginLeft:"4vw", marginRight: "4vw"}}
+                                  onChange={(e) => handleUpdateStartPage(e)}
+                                />
+                                <Form.Control
+                                  type="number"
+                                  name="end#"
+                                  placeholder="End Page"
+                                  style={{marginLeft:"4vw", marginRight: "4vw"}}
+                                  onChange={(e) => handleUpdateEndPage(e)}
+                                />
+                              </Form.Group>
+                              <hr />
+                              <Form.Group className="mb-3 d-flex flex-row justify-content-around w-100 h-100">
+                                <BootstrapSwitchButton
+                                    checked={aiEnabled}
+                                    onlabel='AI'
+                                    offlabel='No AI'
+                                    width={100}
+                                    onChange={(checked) => {
+                                      updateAiEnabled(checked);
+                                  }}
+                                />
+                                <Dropdown>
+                                    <Dropdown.Toggle
+                                      style={{ backgroundColor: "white" , width: "100%"}}
+                                      id="dropdown-basic"
+                                      disabled={!aiEnabled}
+                                    >
+                                      {selectedTemplate.name}
+                                    </Dropdown.Toggle>
+                                    <Dropdown.Menu style={{width: "100%"}}>
+                                      {templates?.map(
+                                        (item, index) => {
+                                          return (
+                                            <Dropdown.Item
+                                              name={item.name}
+                                              key={index}
+                                              onClick={() => setSelectedTemplate(item)}
+                                            >
+                                              {item.name}
+                                            </Dropdown.Item>
+                                          );
+                                        },
+                                      )}
+                                      <Dropdown.Item
+                                              name="templates"
+                                              href="/templates/"
+                                              style={{backgroundColor: "#66ab57"}}
+                                            >
+                                              Add/Edit <FontAwesomeIcon size="xl" icon={faPlus} />
+                                      </Dropdown.Item>
+                                    </Dropdown.Menu>
+                                  </Dropdown>
+                              </Form.Group>
+                            </Col>
+                          </Row>
+                          <Button variant="primary" type="submit" onClick={handleSubmitNofo}>
+                              Submit
+                          </Button>
+                        </Form>
                     )
                   ) : (
                     <Loading />
                   )}
                 </Tab.Pane>
                 <Tab.Pane eventKey="#link2">
-                  <Row style={{marginTop: "1vh"}}>
+                  <Row style={{marginTop: "1vh", zoom: "74%"}}>
                     <Col
                       sm={4}
-                      className="vh-100 overflow-auto"
-                      style={{ maxHeight: "90vh" }}
+                      className="overflow-auto"
+                      style={{ maxHeight: "125vh" }}
                     >
                       <ListGroup>
                         <InputGroup className="mb-1">
@@ -1414,43 +1561,76 @@ function ComplianceListV2() {
                     </Col>
                     <Col
                       sm={8}
-                      className="vh-100 d-flex justify-content-center overflow-scroll"
-                      style={{ maxHeight: "90vh" }}
-                    >
+                      className="d-flex justify-content-center overflow-scroll"
+                      style={{ maxHeight: "125vh" }}
+                    > {proposalData.loading_checklist ? <LoadingChecklist pk={pk} refresh={refreshPage} loading_checklist={proposalData.loading_checklist}/> :
                       <Form style={{ width: "100%" }}>
-                        <Button
-                          style={{ marginBottom: "1vh" }}
-                          onClick={() => handleAddToChecklist()}
-                        >
-                          <FontAwesomeIcon
-                            size="sm"
-                            icon={faPlus}
-                          />
-                        </Button>
-                        <Button
-                          style={{
-                            marginBottom: "1vh",
-                            marginLeft: "1vh",
-                            marginRight: "1vh",
-                          }}
-                          onClick={() => handleSaveChecklist()}
-                        >
-                          <FontAwesomeIcon
-                            size="sm"
-                            icon={faFloppyDisk}
-                          />
-                        </Button>
-                        <CsvDownloadButton
-                          style={{ marginBottom: "1vh" }}
-                          className="btn btn-primary"
-                          data={checklistData}
-                          delimiter=","
-                        >
-                          <FontAwesomeIcon
-                            size="sm"
-                            icon={faFileCsv}
-                          />
-                        </CsvDownloadButton>
+                        <OverlayTrigger
+                            placement="bottom"
+                            delay={{ show: 1000, hide: 50 }}
+                            overlay={
+                              <Popover style={{backgroundColor: "#66ab57", zoom:"74%"}} className="custom-pover">
+                                <Popover.Body style={{backgroundColor: "white"}} className="custom-pover-body">
+                                  <div>Add new row to checklist</div>
+                                </Popover.Body>
+                              </Popover>
+                            }>
+                              <Button
+                                style={{ marginBottom: "1vh"}}
+                                onClick={() => handleAddToChecklist()}
+                              >
+                                <FontAwesomeIcon
+                                  size="sm"
+                                  icon={faPlus}
+                                />
+                              </Button>
+                          </OverlayTrigger>
+                          <OverlayTrigger
+                            placement="bottom"
+                            delay={{ show: 1000, hide: 50 }}
+                            overlay={
+                              <Popover style={{backgroundColor: "#66ab57", zoom:"74%"}} className="custom-pover">
+                                <Popover.Body style={{backgroundColor: "white"}} className="custom-pover-body">
+                                  <div>Save checklist</div>
+                                </Popover.Body>
+                              </Popover>
+                            }>
+                              <Button
+                                style={{
+                                  marginBottom: "1vh",
+                                  marginLeft: "1vh",
+                                  marginRight: "1vh",
+                                }}
+                                onClick={() => handleSaveChecklist()}
+                              >
+                                <FontAwesomeIcon
+                                  size="sm"
+                                  icon={faFloppyDisk}
+                                />
+                              </Button>
+                          </OverlayTrigger>
+                              <CsvDownloadButton
+                                style={{ marginBottom: "1vh" }}
+                                className="btn btn-primary"
+                                data={checklistData}
+                                delimiter=","
+                              >
+                                <OverlayTrigger
+                            placement="bottom"
+                            delay={{ show: 1000, hide: 50 }}
+                            overlay={
+                              <Popover style={{backgroundColor: "#66ab57", zoom:"74%"}} className="custom-pover">
+                                <Popover.Body style={{backgroundColor: "white"}} className="custom-pover-body">
+                                  <div>Export checklist to Excel</div>
+                                </Popover.Body>
+                              </Popover>
+                            }>
+                                <FontAwesomeIcon
+                                  size="sm"
+                                  icon={faFileCsv}
+                                />
+                              </OverlayTrigger>
+                              </CsvDownloadButton>
                         <Table striped bordered hover>
                           <thead>
                             <tr>
@@ -1474,7 +1654,7 @@ function ComplianceListV2() {
                                         .toString()
                                         .concat("_pages")}
                                       as="textarea"
-                                      value={item.pages}
+                                      value={item.page?.toString()}
                                       onChange={(e) =>
                                         handleChecklistChange(e)
                                       }
@@ -1532,11 +1712,12 @@ function ComplianceListV2() {
                           </tbody>
                         </Table>
                       </Form>
+                      }
                     </Col>
                   </Row>
                 </Tab.Pane>
                 <Tab.Pane eventKey="#link3">
-                  <Outline textArray={aiData} proposalData={proposalData} />
+                  <Outline checklistData={checklistData} proposalData={proposalData} />
                 </Tab.Pane>
               </Tab.Content>
             </Col>

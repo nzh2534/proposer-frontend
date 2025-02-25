@@ -12,6 +12,7 @@ import "./App.css";
 import Logout from "./components/Logout";
 import Delete from "./components/Delete";
 import { ComplianceListV2} from "./components/tools/index";
+import ListViewTemplates from "./components/Template";
 
 function App() {
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ function App() {
     exampleproposal: null,
     error: null,
   });
+  const [templateData, setTemplateData] = useState([])
 
   useEffect(() => {
     setProposalData({ loading: true });
@@ -38,6 +40,17 @@ function App() {
           exampleproposal: apiRes["0"],
         });
       });
+      axiosInstance
+        .get('proposals/template/')
+        .catch((error) => {
+          console.log(error);
+          // window.location.href = '/login';
+        })
+        .then((res) => {
+          const apiRes = res.data;
+          console.log(apiRes)
+          setTemplateData(apiRes);
+        });
   }, [setProposalData, navigate]);
 
   return (
@@ -53,7 +66,7 @@ function App() {
             path="/proposals"
             element={<ListView proposals={proposalData.res} />}
           />
-          <Route path="/proposals/:pk" element={<ComplianceListV2 />} />
+          <Route path="/proposals/:pk" element={<ComplianceListV2 proposals={proposalData.res} templates={templateData}/>} />
           <Route
             path="/proposals/create"
             element={<Create proposals={proposalData.exampleproposal} />}
@@ -61,6 +74,10 @@ function App() {
           <Route
             path="/proposals/:pk/delete"
             element={<Delete proposals={proposalData.res} />}
+          />
+          <Route
+            path="/templates"
+            element={<ListViewTemplates templates={templateData} />}
           />
         </Routes>
       </div>
