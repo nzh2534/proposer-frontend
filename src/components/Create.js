@@ -72,46 +72,6 @@ function Create({ proposals }) {
               onChange={handleChange}
             />
           </Form.Group>
-          {/* <Form.Group className="mb-3 form-group">
-            <Form.Label>Description</Form.Label>
-            <Form.Control
-              type="textarea"
-              label="description"
-              name="description"
-              onChange={handleChange}
-            />
-          </Form.Group>
-
-          <Form.Group className="mb-3 form-group">
-            <Form.Label>Donor</Form.Label>
-            <Form.Select
-              type="text"
-              label="donor"
-              name="donor"
-              onChange={handleChange}
-            >
-              <option value=""></option>
-              <option value="USAID">USAID</option>
-              <option value="USDOS">USDOS</option>
-              <option value="KOICA">KOICA</option>
-              <option value="Other">Other</option>
-            </Form.Select>
-          </Form.Group>
-          <Form.Group className="mb-3 form-group">
-            <Form.Label>Priority</Form.Label>
-            <Form.Select
-              type="text"
-              label="priority"
-              name="priority"
-              onChange={handleChange}
-            >
-              <option value=""></option>
-              <option value="Low">Low</option>
-              <option value="Normal">Normal</option>
-              <option value="High">High</option>
-              <option value="Critical">Critical</option>
-            </Form.Select>
-          </Form.Group> */}
           <Form.Group className="mb-3 form-group">
             <Form.Label>Assigned</Form.Label>
             <Form.Select
