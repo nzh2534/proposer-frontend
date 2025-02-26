@@ -152,12 +152,6 @@ function ComplianceListV2({proposals, templates}) {
     data: {},
   });
 
-  // const configuration = new Configuration({
-  //   organization: process.env.REACT_APP_ORG_KEY,
-  //   apiKey: process.env.REACT_APP_API_AI_KEY,
-  // });
-  // const openai = new OpenAIApi(configuration);
-
   const files = acceptedFiles.map((file) => (
     <li key={file.path}>
       {file.path} - {file.size} - {file.type} bytes
@@ -246,30 +240,6 @@ function ComplianceListV2({proposals, templates}) {
     e.preventDefault();
   };
 
-  // const handleDropCalendar = (e) => {
-  //     console.log(e.dataTransfer.getData('name'))
-  // }
-
-  // const handleDropOutline = async (e) => {
-  //   var id = e.dataTransfer.getData("name");
-  //   var specificComplianceItem = complianceData.find((item) => {
-  //     return item.id === parseInt(id);
-  //   });
-  //   var previousData = [...aiData];
-  //   var prompt = activeAiPrompt + ": ";
-  //   try {
-  //     const result = await openai.createCompletion({
-  //       model: process.env.REACT_APP_MODEL,
-  //       max_tokens: 1024,
-  //       prompt: prompt.concat(specificComplianceItem.content_text),
-  //     });
-  //     previousData.push(result.data.choices[0].text);
-  //     updateAiData(previousData);
-  //   } catch (e) {
-  //     //console.log(e);
-  //     console.log(e);
-  //   }
-  // };
 
   const handleDropSection = async (e) => {
     if (e.dataTransfer.getData("name")) {
@@ -368,26 +338,6 @@ function ComplianceListV2({proposals, templates}) {
     }
   };
 
-  // const handleSubmit = (e) => {
-  //     e.preventDefault();
-  //     const newProposalData = Object.assign({}, proposalData);
-  //     newProposalData.complianceimages_set = [...complianceData];
-  //     updateProposalData(newProposalData)
-
-  //     axiosInstance
-  //         .put(`proposals/${proposal.pk}/update/`, {
-  //             title: proposalData.title,
-  //             complianceimages_set: [...complianceData]
-  //         })
-  //         .catch((error) => {
-  //             console.log(error.response)
-  //         })
-  //         .then((res) => {
-  //             console.log(res)
-  //         });
-  // };
-
-  //new section functionality
   const handleChangeNewSection = (e) => {
     var addingSectionCopy = addingSection;
     console.log(e.target.value.trim());
@@ -447,8 +397,6 @@ function ComplianceListV2({proposals, templates}) {
     console.log(imageRef)
   };
 
-  // const navigate = useNavigate();
-
   const handleMerge = (item) => {
     const index = complianceData.findIndex((obj) => obj.id == item.item.id);
     if(index > 0){
@@ -478,21 +426,6 @@ function ComplianceListV2({proposals, templates}) {
       alert("Can only merge when there is a section prior to the selected section")
     }
   }
-
-
-  // const handleChangeNewPrompt = (e) => {
-  //   var addingPromptCopy = addingPrompt;
-  //   addingPromptCopy[e.target.name] = e.target.value.trim();
-  //   updateAddingPrompt(addingPromptCopy);
-  // };
-
-  // const handleSavePrompt = (prompt) => {
-  //   var currentPromptsCopy = aiPrompts;
-  //   currentPromptsCopy.push(prompt);
-  //   updateActiveAiPrompt(prompt);
-  //   updateAddingPrompt({ adding: false, prompt: null });
-  //   updateAiPrompts(currentPromptsCopy);
-  // };
 
   const handleChangeProposalTitle = (e) => {
     let proposalDataCopy = { ...proposalData };
@@ -784,128 +717,6 @@ function ComplianceListV2({proposals, templates}) {
                       ) : ( splitMode.set ? <Splitter item={splitMode.itemRef} refresh={refreshPage} updateSplitMode={updateSplitMode}/> :
                         //viewing
                         <>
-                            {/* <Col
-                              style={{
-                                padding: "3px",
-                                backgroundColor: "#9ab6da",
-                                borderRadius: "5px",
-                                marginLeft: "1vw",
-                                marginRight: "1vw",
-                                maxWidth: "30vw",
-                              }}
-                              onDragOver={(e) => handleAllowDrop(e)}
-                              onDrop={(e) => handleDropOutline(e)}
-                            >
-                              <Dropdown>
-                                {activeAiPrompt.length === 0 ? (
-                                  <FontAwesomeIcon
-                                    size="2xl"
-                                    icon={faFileWord}
-                                  />
-                                ) : (
-                                  <></>
-                                )}
-                                <Dropdown.Toggle
-                                  style={{
-                                    backgroundColor: "#9ab6da",
-                                    marginLeft: "10px",
-                                    maxWidth: "20vw",
-                                    display: "inline-block",
-                                    overflow: "hidden",
-                                    whiteSpace: "nowrap",
-                                    textOverflow: "ellipsis",
-                                  }}
-                                  id="dropdown-basic"
-                                >
-                                  {activeAiPrompt}
-                                </Dropdown.Toggle>
-                                <Dropdown.Menu style={{ maxWidth: "25vw" }}>
-                                  {Object.keys(aiPrompts)?.map(
-                                    (item, index) => {
-                                      return (
-                                        <Container>
-                                          <Button
-                                            style={{ backgroundColor: "white" }}
-                                            name={item}
-                                            key={index}
-                                            onClick={() =>
-                                              updateActiveAiPrompt(
-                                                aiPrompts[item],
-                                              )
-                                            }
-                                          >
-                                            {index + 1}: {aiPrompts[item]}
-                                          </Button>
-                                        </Container>
-                                      );
-                                    },
-                                  )}
-                                  {addingPrompt.adding ? (
-                                    <Container
-                                      style={{
-                                        paddingTop: "1vh",
-                                        borderTop:
-                                          "3px solid rgb(212, 212, 212)",
-                                      }}
-                                    >
-                                      <textarea
-                                        type="text"
-                                        name="prompt"
-                                        placeholder="Prompt Name"
-                                        onChange={(e) =>
-                                          handleChangeNewPrompt(e)
-                                        }
-                                      />
-                                      <Row>
-                                        <Dropdown.Item
-                                          onClick={() =>
-                                            handleSavePrompt(
-                                              addingPrompt.prompt,
-                                            )
-                                          }
-                                        >
-                                          <FontAwesomeIcon
-                                            size="sm"
-                                            icon={faFloppyDisk}
-                                          />
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                          onClick={() =>
-                                            updateAddingPrompt({
-                                              ...addingPrompt,
-                                              adding: false,
-                                            })
-                                          }
-                                        >
-                                          <FontAwesomeIcon
-                                            size="sm"
-                                            icon={faX}
-                                          />
-                                        </Dropdown.Item>
-                                      </Row>
-                                    </Container>
-                                  ) : (
-                                    <>
-                                      <Dropdown.Item
-                                        onMouseEnter={() =>
-                                          updateAddingPrompt({
-                                            ...addingPrompt,
-                                            adding: true,
-                                          })
-                                        }
-                                      >
-                                        <FontAwesomeIcon
-                                          size="sm"
-                                          icon={faPlus}
-                                        />{" "}
-                                        Add
-                                      </Dropdown.Item>
-                                    </>
-                                  )}
-                                </Dropdown.Menu>
-                              </Dropdown>
-                            </Col> */}
-                          {/* </Navbar> */}
                           <Tab.Container
                             id="list-group-tabs"
                             defaultActiveKey="#link1"
