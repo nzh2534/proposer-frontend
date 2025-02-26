@@ -29,17 +29,6 @@ function Outline({ checklistData, proposalData }) {
     testHeader.length,
   );
   const [requests, updateRequests] = useState([
-    // {
-    //     createHeader: {
-    //         type: "DEFAULT",
-    //         sectionBreakLocation: {index:0}
-    //       },
-    // },
-    // {
-    //     createFooter: {
-    //         type: "DEFAULT"
-    //       }
-    // },
     {
       insertText: {
         text: testHeader,
@@ -48,14 +37,6 @@ function Outline({ checklistData, proposalData }) {
         },
       },
     },
-    // {
-    //   insertText: {
-    //     text: instructionText,
-    //     location: {
-    //       index: testHeader.length + 1,
-    //     },
-    //   },
-    // },
   ]);
 
   function start() {
@@ -94,9 +75,6 @@ function Outline({ checklistData, proposalData }) {
   }, []);
 
   const createFile = () => {
-    // var accessToken = gapi.auth.getToken().access_token;
-    // var body = {title: "GAPI COPY"};
-
     var request = gapi.client.request({
       path: process.env.REACT_APP_TEMPLATE_PATH,
       method: "POST",
@@ -136,7 +114,6 @@ function Outline({ checklistData, proposalData }) {
   };
 
   const updateFile = (requests) => {
-    // var accessToken = gapi.auth.getToken().access_token;
     fetch(
       `https://docs.googleapis.com/v1/documents/${documentId}:batchUpdate?key=${API_KEY}`,
       {
@@ -177,63 +154,6 @@ function Outline({ checklistData, proposalData }) {
                     },
                   },
                 },
-                // {
-                //     insertInlineImage: {
-                //         uri: "https://drive.google.com/uc?export=view&id=1p72vX9rbU0zuNRkuXNnUNpCXUkcWfvBX",
-                //         objectSize: {
-                //             height: {
-                //                 magnitude: 60,
-                //                 unit: "PT"
-                //             },
-                //             width: {
-                //                 magnitude: 120,
-                //                 unit: "PT"
-                //             },
-                //         },
-                //         endOfSegmentLocation: {
-                //         segmentId: val.replies[0].createHeader.headerId
-                //         },
-                //     },
-                // },
-                // {
-                //     updateTextStyle: {
-                //       textStyle: {
-                //         italic: true,
-                //         fontSize: {magnitude: 11, unit: 'PT'},
-                //         weightedFontFamily: {fontFamily: 'Times New Roman', weight: 400}
-                //       },
-                //       fields: "*",
-                //       range: {
-                //         segmentId: val.replies[0].createHeader.headerId,
-                //         startIndex: 0,
-                //         endIndex: proposalData.title.length + 1,
-                //       },
-                //     },
-                // },
-                // {
-                //     insertText: {
-                //         text: "Use or disclosure of data contained on this sheet is subject to the restriction on the title page of this application.",
-                //         location: {
-                //         segmentId: val.replies[1].createFooter.footerId,
-                //         index: 0,
-                //         },
-                //     },
-                // },
-                // {
-                //     updateTextStyle: {
-                //       textStyle: {
-                //         italic: true,
-                //         fontSize: {magnitude: 9, unit: 'PT'},
-                //         weightedFontFamily: {fontFamily: 'Times New Roman', weight: 400}
-                //       },
-                //       fields: "*",
-                //       range: {
-                //         segmentId: val.replies[1].createFooter.footerId,
-                //         startIndex: 0,
-                //         endIndex: "Use or disclosure of data contained on this sheet is subject to the restriction on the title page of this application.".length + 1,
-                //       },
-                //     },
-                // },
               ],
             }),
           },
@@ -261,14 +181,6 @@ function Outline({ checklistData, proposalData }) {
     const formData = new FormData(e.target),
       formDataObj = Object.fromEntries(formData.entries());
     let newRequests = [
-      // {
-      //   insertSectionBreak: {
-      //     sectionType: "NEXT_PAGE",
-      //     location: {
-      //       index: documentIndex,
-      //     },
-      //   },
-      // },
     ];
     sectionCountArr.forEach((item) => {
         var pagesInSection = formDataObj[`${item}_pages`];
